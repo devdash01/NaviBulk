@@ -223,8 +223,8 @@ sih/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/devdash01/navibulk.git
-cd navibulk
+git clone https://github.com/devdash01/NaviBulk.git
+cd NaviBulk
 ```
 
 ### 2. Environment Configuration
