@@ -164,7 +164,7 @@ export default function RouteLine({
             {/* Outer subtle ring */}
             <circle
               r="7"
-              fill="#16191E"
+              fill="#FFFFFF"
               stroke={activeStep === wp.step ? "#E8B968" : "#C9973F"}
               strokeWidth={activeStep === wp.step ? "2" : "1.5"}
               strokeOpacity={activeStep === wp.step ? "1" : "0.7"}
