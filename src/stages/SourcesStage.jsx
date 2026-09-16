@@ -3,7 +3,19 @@
 import React, { useState } from 'react';
 import { useDecisionEngine } from '../context/DecisionContext.jsx';
 import StageShell from '../components/StageShell.jsx';
-import { Globe, GitBranch, CheckCircle2, AlertCircle, FileText, ArrowRight, ShieldCheck } from 'lucide-react';
+import { 
+  Globe, 
+  GitBranch, 
+  CheckCircle2, 
+  AlertCircle, 
+  FileText, 
+  ArrowRight, 
+  ShieldCheck,
+  TrendingDown,
+  DollarSign,
+  Sparkles,
+  Scale
+} from 'lucide-react';
 
 export default function SourcesStage() {
   const {
@@ -24,9 +36,22 @@ export default function SourcesStage() {
     setTimeout(() => setEoiConfirmedOrigin(null), 4000);
   };
 
+  // Find candidate origin with maximum cost savings
+  const candidatesWithSavings = sourceOpportunities
+    .filter(c => !c.isBasePlan && c.engineCostPerTonne !== null && c.engineCostPerTonne < baseDeliveredCost.totalLanded)
+    .sort((a, b) => a.engineCostPerTonne - b.engineCostPerTonne);
+  const bestSavingCandidate = candidatesWithSavings[0];
+  const maxSavingsPerMt = bestSavingCandidate 
+    ? Number((baseDeliveredCost.totalLanded - bestSavingCandidate.engineCostPerTonne).toFixed(2))
+    : 0;
+  const maxSavingsUsd = bestSavingCandidate 
+    ? Math.round(maxSavingsPerMt * inputs.tonnage)
+    : 0;
+  const maxSavingsInrCr = Number(((maxSavingsUsd * 83.2) / 10000000).toFixed(2));
+
   const conclusionText = adoptedCandidateBranch
-    ? `Candidate Branch Active: Comparing candidate origin ${adoptedCandidateBranch.country} (Delivered $${adoptedCandidateBranch.engineCostPerTonne?.toFixed(2)}/MT) against authoritative Base Plan (${inputs.originCountry} at $${baseDeliveredCost.totalLanded}/MT). Base Plan remains authoritative while technical blend qualification is evaluated.`
-    : `Alternative origin analysis evaluated 5 global supply basins against the optimized Base Plan (${inputs.originCountry} @ $${baseDeliveredCost.totalLanded}/MT). While candidate origins like Mozambique or Russia show freight variance, metallurgical blend clearance and trade compliance screening are mandatory before switching suppliers.`;
+    ? `Candidate Branch Active: Comparing candidate origin ${adoptedCandidateBranch.country} (Delivered $${adoptedCandidateBranch.engineCostPerTonne?.toFixed(2)}/MT, Total Outlay $${Math.round(adoptedCandidateBranch.engineCostPerTonne * inputs.tonnage).toLocaleString()} USD) against authoritative Base Plan (${inputs.originCountry} at $${baseDeliveredCost.totalLanded}/MT). Base Plan remains authoritative while technical blend qualification is evaluated.`
+    : `Alternative origin analysis evaluated 5 global supply basins against the optimized Base Plan (${inputs.originCountry} @ $${baseDeliveredCost.totalLanded}/MT). While candidate origins like ${bestSavingCandidate?.country || 'Mozambique'} show up to +$${maxSavingsUsd.toLocaleString()} USD (₹${maxSavingsInrCr} Cr) in total landed cost optimization, metallurgical blend clearance and trade compliance screening are mandatory before switching suppliers.`;
 
   return (
     <StageShell
@@ -47,30 +72,118 @@ export default function SourcesStage() {
               Base Plan: {inputs.originCountry} → {inputs.destinationPortKey.toUpperCase()} ({recommendedVessel?.vesselName})
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '0.66rem', color: '#64748B', textTransform: 'uppercase' }}>Benchmark Landed Cost</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
                 ${baseDeliveredCost.totalLanded} <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>/ MT</span>
               </div>
+              <div style={{ fontSize: '0.7rem', color: '#64748B', fontFamily: 'var(--font-mono)' }}>
+                Total Outlay: ${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD (₹{baseDeliveredCost.totalOutlayInrCr} Cr)
+              </div>
             </div>
-            <span style={{ fontSize: '0.7rem', background: '#0F172A', color: '#FFF', padding: '0.25rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.7rem', background: '#0F172A', color: '#FFF', padding: '0.35rem 0.65rem', borderRadius: '4px', fontWeight: 700 }}>
               AUTHORITATIVE
             </span>
           </div>
         </div>
 
-        {/* ── 2. SEPARATOR: CAN WE IMPROVE THIS PLAN? ── */}
-        <div style={{ textAlign: 'center', margin: '0.25rem 0' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '0.35rem 1rem', borderRadius: '20px' }}>
-            <Globe size={15} color="#2563EB" />
-            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1E40AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              CAN WE IMPROVE THIS PLAN?
-            </span>
+        {/* ── 2. TOTAL COST OPTIMIZATION & ARBITRAGE DELTA SUMMARY ── */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Scale size={18} color="#2563EB" />
+              <div>
+                <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#2563EB', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  Total Cost Optimization & Arbitrage Potential
+                </span>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  Cross-Basin Landed Outlay Comparison ({inputs.tonnage.toLocaleString()} MT Cargo)
+                </h3>
+              </div>
+            </div>
+
+            {bestSavingCandidate && (
+              <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', padding: '0.4rem 0.85rem', borderRadius: '6px', textAlign: 'right' }}>
+                <span style={{ fontSize: '0.64rem', color: '#166534', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                  Max Arbitrage Optimization
+                </span>
+                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#15803D', fontFamily: 'var(--font-mono)' }}>
+                  +${maxSavingsUsd.toLocaleString()} USD ({bestSavingCandidate.country})
+                </span>
+                <span style={{ fontSize: '0.68rem', color: '#166534', display: 'block' }}>
+                  Save -${maxSavingsPerMt}/MT • ₹{maxSavingsInrCr} Cr budget benefit
+                </span>
+              </div>
+            )}
           </div>
-          <p style={{ fontSize: '0.82rem', color: '#64748B', margin: '0.4rem 0 0' }}>
-            NaviBulk evaluates eligible alternative global supply origins against the optimized Base Plan benchmark.
-          </p>
+
+          {/* Quick Basin Comparison Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '0.75rem' }}>
+            {sourceOpportunities.map((candidate, i) => {
+              const isBase = candidate.isBasePlan;
+              const isAdopted = adoptedCandidateBranch?.country === candidate.country;
+              const delta = candidate.engineCostPerTonne !== null
+                ? candidate.engineCostPerTonne - baseDeliveredCost.totalLanded
+                : null;
+              const candidateTotalUsd = candidate.engineCostPerTonne !== null
+                ? Math.round(candidate.engineCostPerTonne * inputs.tonnage)
+                : null;
+              const totalDeltaUsd = delta !== null
+                ? Math.round(Math.abs(delta) * inputs.tonnage)
+                : null;
+
+              return (
+                <div 
+                  key={i}
+                  style={{
+                    background: isAdopted ? '#EFF6FF' : isBase ? '#F8FAFC' : '#FFFFFF',
+                    border: isAdopted ? '2px solid #2563EB' : isBase ? '1px solid #CBD5E1' : '1px solid #E2E8F0',
+                    borderRadius: '6px',
+                    padding: '0.85rem'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0F172A' }}>
+                      {candidate.country}
+                    </span>
+                    {isBase && (
+                      <span style={{ fontSize: '0.6rem', background: '#0F172A', color: '#FFF', padding: '0.1rem 0.35rem', borderRadius: '3px', fontWeight: 800 }}>
+                        BASE
+                      </span>
+                    )}
+                    {isAdopted && (
+                      <span style={{ fontSize: '0.6rem', background: '#2563EB', color: '#FFF', padding: '0.1rem 0.35rem', borderRadius: '3px', fontWeight: 800 }}>
+                        BRANCH
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.35rem' }}>
+                    ${candidate.engineCostPerTonne?.toFixed(2)} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>/ MT</span>
+                  </div>
+
+                  <div style={{ fontSize: '0.7rem', color: '#64748B', fontFamily: 'var(--font-mono)' }}>
+                    Total: ${candidateTotalUsd?.toLocaleString()} USD
+                  </div>
+
+                  <div style={{ marginTop: '0.4rem', paddingTop: '0.35rem', borderTop: '1px solid #F1F5F9', fontSize: '0.72rem', fontWeight: 700 }}>
+                    {isBase ? (
+                      <span style={{ color: '#64748B' }}>Baseline Benchmark</span>
+                    ) : delta < 0 ? (
+                      <span style={{ color: '#16A34A' }}>
+                        Save +${totalDeltaUsd?.toLocaleString()} USD (-${Math.abs(delta).toFixed(2)}/MT)
+                      </span>
+                    ) : (
+                      <span style={{ color: '#DC2626' }}>
+                        Cost +${totalDeltaUsd?.toLocaleString()} USD (+${delta?.toFixed(2)}/MT)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── 3. EOI INLINE CONFIRMATION NOTIFICATION ── */}
@@ -99,8 +212,9 @@ export default function SourcesStage() {
               <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0', color: '#64748B', textAlign: 'left' }}>
                 <th style={{ padding: '0.65rem 0.5rem' }}>Source Basin</th>
                 <th style={{ padding: '0.65rem 0.5rem' }}>Distance</th>
-                <th style={{ padding: '0.65rem 0.5rem' }}>Delivered Est.</th>
-                <th style={{ padding: '0.65rem 0.5rem' }}>Δ vs Base</th>
+                <th style={{ padding: '0.65rem 0.5rem' }}>Delivered Rate</th>
+                <th style={{ padding: '0.65rem 0.5rem' }}>Total Outlay</th>
+                <th style={{ padding: '0.65rem 0.5rem' }}>Total Cost Delta vs Base</th>
                 <th style={{ padding: '0.65rem 0.5rem' }}>Quality / Spec</th>
                 <th style={{ padding: '0.65rem 0.5rem' }}>Qualification Status</th>
                 <th style={{ padding: '0.65rem 0.5rem' }}>Verdict</th>
@@ -113,6 +227,15 @@ export default function SourcesStage() {
                 const isAdopted = adoptedCandidateBranch?.country === candidate.country;
                 const delta = candidate.engineCostPerTonne !== null
                   ? candidate.engineCostPerTonne - baseDeliveredCost.totalLanded
+                  : null;
+                const totalOutlay = candidate.engineCostPerTonne !== null
+                  ? Math.round(candidate.engineCostPerTonne * inputs.tonnage)
+                  : null;
+                const totalDeltaUsd = delta !== null
+                  ? Math.round(delta * inputs.tonnage)
+                  : null;
+                const totalDeltaInrCr = totalDeltaUsd !== null
+                  ? Number(((totalDeltaUsd * 83.2) / 10000000).toFixed(2))
                   : null;
 
                 const verdictColor = candidate.verdict === 'BASE PLAN' ? '#0F172A'
@@ -144,24 +267,40 @@ export default function SourcesStage() {
                       {candidate.distanceNm?.toLocaleString()} NM
                     </td>
 
-                    {/* Delivered Est */}
+                    {/* Delivered Est Rate */}
                     <td style={{ padding: '0.75rem 0.5rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#0F172A' }}>
                       {candidate.engineCostPerTonne !== null ? `$${candidate.engineCostPerTonne?.toFixed(2)}/MT` : 'N/A'}
                     </td>
 
-                    {/* Delta */}
-                    <td style={{ padding: '0.75rem 0.5rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: delta === null || delta === 0 ? '#64748B' : delta < 0 ? '#16A34A' : '#DC2626' }}>
-                      {isBase ? '—' : delta !== null ? `${delta > 0 ? '+' : ''}$${delta.toFixed(2)}` : 'N/A'}
+                    {/* Total Outlay */}
+                    <td style={{ padding: '0.75rem 0.5rem', fontFamily: 'var(--font-mono)', color: '#334155' }}>
+                      ${totalOutlay?.toLocaleString()} USD
+                    </td>
+
+                    {/* Total Cost Optimization Delta */}
+                    <td style={{ padding: '0.75rem 0.5rem', fontFamily: 'var(--font-mono)' }}>
+                      {isBase ? (
+                        <span style={{ color: '#64748B', fontWeight: 600 }}>— Benchmark</span>
+                      ) : delta !== null ? (
+                        <div>
+                          <span style={{ fontWeight: 800, color: delta < 0 ? '#16A34A' : '#DC2626' }}>
+                            {delta > 0 ? '+' : ''}${delta.toFixed(2)}/MT
+                          </span>
+                          <div style={{ fontSize: '0.68rem', color: delta < 0 ? '#166534' : '#991B1B', fontWeight: 600 }}>
+                            {delta < 0 ? `Save +$${Math.abs(totalDeltaUsd).toLocaleString()} (₹${Math.abs(totalDeltaInrCr)} Cr)` : `Cost -$${Math.abs(totalDeltaUsd).toLocaleString()} (₹${Math.abs(totalDeltaInrCr)} Cr)`}
+                          </div>
+                        </div>
+                      ) : 'N/A'}
                     </td>
 
                     {/* Quality / Spec */}
-                    <td style={{ padding: '0.75rem 0.5rem', maxWidth: '200px' }}>
+                    <td style={{ padding: '0.75rem 0.5rem', maxWidth: '190px' }}>
                       <div style={{ fontSize: '0.72rem', color: '#0F172A', fontWeight: 600 }}>{candidate.specGrade}</div>
                       <div style={{ fontSize: '0.68rem', color: '#64748B' }}>{candidate.compatibility}</div>
                     </td>
 
                     {/* Qualification */}
-                    <td style={{ padding: '0.75rem 0.5rem', maxWidth: '180px', fontSize: '0.7rem', color: '#475569' }}>
+                    <td style={{ padding: '0.75rem 0.5rem', maxWidth: '170px', fontSize: '0.7rem', color: '#475569' }}>
                       {candidate.qualificationStatus}
                     </td>
 
@@ -205,7 +344,7 @@ export default function SourcesStage() {
                               cursor: 'pointer'
                             }}
                           >
-                            {isAdopted ? 'Branch Active' : 'Adopt as Candidate'}
+                            {isAdopted ? 'Branch Active' : 'Adopt Branch'}
                           </button>
 
                           <button
@@ -221,7 +360,7 @@ export default function SourcesStage() {
                               cursor: 'pointer'
                             }}
                           >
-                            Initiate EOI
+                            EOI
                           </button>
                         </div>
                       )}
@@ -238,7 +377,7 @@ export default function SourcesStage() {
           </table>
 
           <div style={{ marginTop: '1rem', padding: '0.65rem 0.85rem', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', fontSize: '0.72rem', color: '#64748B' }}>
-            <strong>Branching Integrity Rule:</strong> "Adopt as Candidate" activates an analytical comparison branch only. It does NOT overwrite the original Base Plan ({inputs.originCountry}), nor does it silently alter global inputs. The original source remains the authoritative benchmark.
+            <strong>Branching Integrity Rule:</strong> "Adopt Branch" activates an analytical comparison branch only. It does NOT overwrite the original Base Plan ({inputs.originCountry}), nor does it silently alter global inputs. The original source remains the authoritative benchmark.
           </div>
         </div>
 

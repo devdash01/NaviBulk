@@ -9,6 +9,7 @@ import { VESSEL_CLASSES } from '../data/portConstraints';
 const PORT_COORDINATES = {
   Australia: { x: 840, y: 395, label: 'Hay Point / Dalrymple Bay', flag: 'AU', region: 'Queensland Coal Terminal' },
   US: { x: 130, y: 205, label: 'Norfolk (Hampton Roads)', flag: 'US', region: 'US Atlantic East Coast' },
+  'United States': { x: 130, y: 205, label: 'Norfolk (Hampton Roads)', flag: 'US', region: 'US Atlantic East Coast' },
   Mozambique: { x: 415, y: 385, label: 'Maputo / Matola Terminal', flag: 'MZ', region: 'Mozambique Channel' },
   Indonesia: { x: 725, y: 305, label: 'Taboneo Anchorage (Kalimantan)', flag: 'ID', region: 'South Kalimantan Coal' },
   Russia: { x: 865, y: 135, label: 'Vostochny Bulk Terminal', flag: 'RU', region: 'Far East Pacific' },
@@ -29,7 +30,8 @@ export default function VoyageRouteMap({
   onSelectPort,
   speedKnots: externalSpeed,
   onSpeedChange,
-  compact = false
+  compact = false,
+  theme = 'light'
 }) {
   const [viewMode, setViewMode] = useState('chart'); // 'chart' | 'bathymetry'
   const [internalSpeed, setInternalSpeed] = useState(13.0); // Eco-speed baseline
@@ -37,10 +39,11 @@ export default function VoyageRouteMap({
   const currentSpeed = externalSpeed !== undefined ? externalSpeed : internalSpeed;
   const setSpeed = onSpeedChange || setInternalSpeed;
 
-  const origin = PORT_COORDINATES[originCountry] || PORT_COORDINATES.Australia;
+  const originKey = originCountry === 'United States' ? 'US' : originCountry;
+  const origin = PORT_COORDINATES[originCountry] || PORT_COORDINATES[originKey] || PORT_COORDINATES.Australia;
   const destination = PORT_COORDINATES[destinationPortKey] || PORT_COORDINATES.paradip;
 
-  const distMatrix = NAUTICAL_DISTANCE_MATRIX[originCountry] || {};
+  const distMatrix = NAUTICAL_DISTANCE_MATRIX[originKey] || NAUTICAL_DISTANCE_MATRIX[originCountry] || {};
   const distanceNm = distMatrix[destinationPortKey] || 4850;
 
   // Vessel baseline specifications for hydrodynamics
@@ -80,7 +83,7 @@ export default function VoyageRouteMap({
     } else if (originCountry === 'Mozambique') {
       // Maputo -> Mozambique Channel -> Madagascar East -> Equatorial Indian Ocean -> Bay of Bengal -> Paradip
       return `M ${origin.x} ${origin.y} C 460 360, 510 320, 540 285 S 570 260, ${destination.x} ${destination.y}`;
-    } else if (originCountry === 'US') {
+    } else if (originCountry === 'US' || originCountry === 'United States') {
       // Norfolk -> North Atlantic -> South Atlantic -> Cape of Good Hope -> Indian Ocean -> Bay of Bengal (11,400 NM via Cape)
       return `M ${origin.x} ${origin.y} C 210 270, 310 440, 420 460 S 520 370, ${destination.x} ${destination.y}`;
     } else if (originCountry === 'Russia') {
@@ -95,29 +98,32 @@ export default function VoyageRouteMap({
 
   const routePathD = getCorridorPath();
 
+  const isLight = theme === 'light';
+
   return (
     <div 
       className="voyage-route-sea-chart"
       style={{
-        background: '#181A1D',
-        borderRadius: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: isLight ? '#FFFFFF' : '#181A1D',
+        borderRadius: '8px',
+        border: isLight ? '1px solid #E2E8F0' : '1px solid rgba(255, 255, 255, 0.08)',
         overflow: 'hidden',
-        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.45)',
+        boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.03)' : '0 12px 32px rgba(0, 0, 0, 0.45)',
         position: 'relative'
       }}
     >
       {/* Chart Telemetry Header */}
       <div 
         style={{
-          padding: compact ? '0.65rem 1rem' : '1rem 1.4rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: compact ? '0.65rem 1rem' : '0.85rem 1.25rem',
+          borderBottom: isLight ? '1px solid #1E293B' : '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: compact ? '0.6rem' : '1rem',
-          background: '#22252A'
+          background: '#0F172A',
+          color: '#FFFFFF'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -125,12 +131,12 @@ export default function VoyageRouteMap({
             width: '32px',
             height: '32px',
             borderRadius: '6px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
+            background: 'rgba(56, 189, 248, 0.15)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#F59E0B'
+            color: '#38BDF8'
           }}>
             <Navigation size={16} />
           </div>
@@ -138,16 +144,16 @@ export default function VoyageRouteMap({
           <div>
             <div style={{ 
               fontSize: '0.68rem', 
-              color: '#F59E0B', 
+              color: '#38BDF8', 
               textTransform: 'uppercase', 
               letterSpacing: '0.08em',
               fontWeight: 800 
             }}>
-              LIVE MARITIME NAVIGATION CORRIDOR
+              MARITIME NAVIGATION CORRIDOR
             </div>
             <div style={{ 
-              fontFamily: "'Inter', sans-serif", 
-              fontSize: '1.15rem', 
+              fontFamily: "var(--font-sans, 'Inter', sans-serif)", 
+              fontSize: '1.05rem', 
               color: '#FFFFFF', 
               fontWeight: 800,
               letterSpacing: '-0.01em'
@@ -566,8 +572,8 @@ export default function VoyageRouteMap({
       {/* ── INTERACTIVE SPEED & ECO-STEAMING SAVINGS SLIDER CONSOLE ── */}
       <div 
         style={{
-          background: '#181A1D',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          background: isLight ? '#F8FAFC' : '#181A1D',
+          borderTop: isLight ? '1px solid #E2E8F0' : '1px solid rgba(255, 255, 255, 0.08)',
           padding: compact ? '0.65rem 1rem' : '1.1rem 1.4rem',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -579,18 +585,18 @@ export default function VoyageRouteMap({
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Gauge size={15} color="#F59E0B" />
+              <Gauge size={15} color={isLight ? '#2563EB' : '#F59E0B'} />
               <label 
                 htmlFor="voyage-speed-slider"
                 style={{ 
                   fontSize: '0.74rem', 
                   fontWeight: 800, 
-                  color: '#FFFFFF', 
+                  color: isLight ? '#0F172A' : '#FFFFFF', 
                   textTransform: 'uppercase', 
                   letterSpacing: '0.06em' 
                 }}
               >
-                Vessel Cruising Speed (Eco-Steaming Slider)
+                Vessel Cruising Speed (Eco-Steaming Optimization)
               </label>
             </div>
             
@@ -600,9 +606,9 @@ export default function VoyageRouteMap({
                   type="button"
                   onClick={() => setSpeed(recommendedSpeed)}
                   style={{
-                    background: 'rgba(245, 158, 11, 0.2)',
-                    border: '1px solid #F59E0B',
-                    color: '#F59E0B',
+                    background: isLight ? '#EFF6FF' : 'rgba(245, 158, 11, 0.2)',
+                    border: isLight ? '1px solid #BFDBFE' : '1px solid #F59E0B',
+                    color: isLight ? '#1D4ED8' : '#F59E0B',
                     borderRadius: '4px',
                     padding: '0.2rem 0.6rem',
                     fontSize: '0.68rem',
@@ -620,10 +626,12 @@ export default function VoyageRouteMap({
               )}
 
               <span style={{ 
-                fontFamily: "'JetBrains Mono', monospace", 
+                fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)", 
                 fontSize: '1.1rem', 
                 fontWeight: 800, 
-                color: currentSpeed < baseSpeed ? '#34D399' : currentSpeed === baseSpeed ? '#E2E8F0' : '#F87171' 
+                color: isLight 
+                  ? (currentSpeed < baseSpeed ? '#16A34A' : currentSpeed === baseSpeed ? '#0F172A' : '#DC2626')
+                  : (currentSpeed < baseSpeed ? '#34D399' : currentSpeed === baseSpeed ? '#E2E8F0' : '#F87171')
               }}>
                 {currentSpeed.toFixed(1)} Knots
               </span>
@@ -632,9 +640,17 @@ export default function VoyageRouteMap({
                 fontWeight: 800, 
                 padding: '0.15rem 0.45rem', 
                 borderRadius: '3px',
-                background: currentSpeed === recommendedSpeed ? 'rgba(16, 185, 129, 0.25)' : currentSpeed <= 12.5 ? 'rgba(52, 211, 153, 0.15)' : currentSpeed <= 14.0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                color: currentSpeed === recommendedSpeed ? '#34D399' : currentSpeed <= 12.5 ? '#34D399' : currentSpeed <= 14.0 ? '#F59E0B' : '#F87171',
-                border: `1px solid ${currentSpeed === recommendedSpeed ? '#10B981' : currentSpeed <= 12.5 ? 'rgba(52, 211, 153, 0.3)' : currentSpeed <= 14.0 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                background: currentSpeed === recommendedSpeed 
+                  ? (isLight ? '#DCFCE7' : 'rgba(16, 185, 129, 0.25)') 
+                  : currentSpeed < baseSpeed 
+                  ? (isLight ? '#F0FDF4' : 'rgba(52, 211, 153, 0.15)') 
+                  : (isLight ? '#FEF2F2' : 'rgba(239, 68, 68, 0.15)'),
+                color: currentSpeed === recommendedSpeed 
+                  ? (isLight ? '#15803D' : '#34D399') 
+                  : currentSpeed < baseSpeed 
+                  ? (isLight ? '#16A34A' : '#34D399') 
+                  : (isLight ? '#DC2626' : '#F87171'),
+                border: `1px solid ${currentSpeed === recommendedSpeed ? '#86EFAC' : isLight ? '#E2E8F0' : 'rgba(255, 255, 255, 0.1)'}`
               }}>
                 {currentSpeed === recommendedSpeed ? '★ OPTIMAL ECO' : currentSpeed <= 12.0 ? 'SUPER ECO' : currentSpeed < baseSpeed ? 'ECO STEAM' : currentSpeed === baseSpeed ? 'DESIGN' : 'HIGH SPEED'}
               </span>
@@ -642,7 +658,7 @@ export default function VoyageRouteMap({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <span style={{ fontSize: '0.68rem', color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}>10.5 kts</span>
+            <span style={{ fontSize: '0.68rem', color: isLight ? '#64748B' : '#94A3B8', fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)" }}>10.5 kts</span>
             <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input 
                 id="voyage-speed-slider"
@@ -655,13 +671,13 @@ export default function VoyageRouteMap({
                 style={{
                   width: '100%',
                   cursor: 'pointer',
-                  accentColor: currentSpeed === recommendedSpeed ? '#34D399' : currentSpeed < baseSpeed ? '#10B981' : '#F59E0B',
+                  accentColor: currentSpeed === recommendedSpeed ? '#10B981' : currentSpeed < baseSpeed ? '#2563EB' : '#F59E0B',
                   height: '6px',
                   borderRadius: '3px'
                 }}
               />
             </div>
-            <span style={{ fontSize: '0.68rem', color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}>15.5 kts</span>
+            <span style={{ fontSize: '0.68rem', color: isLight ? '#64748B' : '#94A3B8', fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)" }}>15.5 kts</span>
           </div>
 
           {/* Recommended Speed Advisory Banner */}
@@ -670,19 +686,19 @@ export default function VoyageRouteMap({
             justifyContent: 'space-between', 
             alignItems: 'center',
             fontSize: '0.68rem', 
-            color: '#94A3B8', 
+            color: isLight ? '#475569' : '#94A3B8', 
             marginTop: '0.45rem',
             padding: '0.35rem 0.6rem',
-            background: 'rgba(255, 255, 255, 0.03)',
+            background: isLight ? '#FFFFFF' : 'rgba(255, 255, 255, 0.03)',
             borderRadius: '4px',
-            border: '1px solid rgba(255, 255, 255, 0.05)'
+            border: isLight ? '1px solid #E2E8F0' : '1px solid rgba(255, 255, 255, 0.05)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span style={{ color: '#34D399', fontWeight: 700 }}>Recommended Speed: {recommendedSpeed.toFixed(1)} kts</span>
+              <span style={{ color: isLight ? '#166534' : '#34D399', fontWeight: 700 }}>Recommended Speed: {recommendedSpeed.toFixed(1)} kts</span>
               <span>•</span>
               <span>{distanceNm.toLocaleString()} NM corridor saves +${recommendedSavingsUsd.toLocaleString()} USD in bunker fuel</span>
             </div>
-            <span>Baseline: {baseSpeed.toFixed(1)} kts ({baseBurnTpd} MT/d)</span>
+            <span style={{ color: isLight ? '#64748B' : '#94A3B8' }}>Baseline: {baseSpeed.toFixed(1)} kts ({baseBurnTpd} MT/d)</span>
           </div>
         </div>
 
@@ -692,47 +708,47 @@ export default function VoyageRouteMap({
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '0.75rem',
-            background: '#22252A',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: isLight ? '#FFFFFF' : '#22252A',
+            border: isLight ? '1px solid #E2E8F0' : '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '8px',
             padding: '0.75rem 1rem'
           }}
         >
           {/* Metric 1: Transit Duration */}
           <div>
-            <span style={{ fontSize: '0.64rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>
+            <span style={{ fontSize: '0.64rem', color: isLight ? '#64748B' : '#94A3B8', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>
               Transit Sea Days
             </span>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF' }}>
+            <div style={{ fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)", fontSize: '1.15rem', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF' }}>
               {transitSeaDays}d
             </div>
-            <span style={{ fontSize: '0.65rem', color: currentSpeed < baseSpeed ? '#94A3B8' : '#64748B' }}>
+            <span style={{ fontSize: '0.65rem', color: isLight ? '#64748B' : '#94A3B8' }}>
               {currentSpeed < baseSpeed ? `+${(transitSeaDays - baseTransitSeaDays).toFixed(1)}d vs design` : `${(transitSeaDays - baseTransitSeaDays).toFixed(1)}d vs design`}
             </span>
           </div>
 
           {/* Metric 2: Fuel Burn Rate */}
           <div>
-            <span style={{ fontSize: '0.64rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>
+            <span style={{ fontSize: '0.64rem', color: isLight ? '#64748B' : '#94A3B8', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>
               Bunker Daily Burn
             </span>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1.15rem', fontWeight: 800, color: '#F59E0B' }}>
+            <div style={{ fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)", fontSize: '1.15rem', fontWeight: 800, color: isLight ? '#B45309' : '#F59E0B' }}>
               {burnAtSpeedTpd.toFixed(1)} <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>MT/d</span>
             </div>
-            <span style={{ fontSize: '0.65rem', color: burnAtSpeedTpd < baseBurnTpd ? '#34D399' : '#F87171' }}>
+            <span style={{ fontSize: '0.65rem', color: burnAtSpeedTpd < baseBurnTpd ? (isLight ? '#16A34A' : '#34D399') : (isLight ? '#DC2626' : '#F87171') }}>
               {burnAtSpeedTpd < baseBurnTpd ? `-${(baseBurnTpd - burnAtSpeedTpd).toFixed(1)} MT/d` : `+${(burnAtSpeedTpd - baseBurnTpd).toFixed(1)} MT/d`}
             </span>
           </div>
 
           {/* Metric 3: Dollar Savings / Surcharge */}
           <div>
-            <span style={{ fontSize: '0.64rem', color: bunkerSavingsUsd >= 0 ? '#34D399' : '#F87171', textTransform: 'uppercase', fontWeight: 800, display: 'block' }}>
+            <span style={{ fontSize: '0.64rem', color: bunkerSavingsUsd >= 0 ? (isLight ? '#16A34A' : '#34D399') : (isLight ? '#DC2626' : '#F87171'), textTransform: 'uppercase', fontWeight: 800, display: 'block' }}>
               {bunkerSavingsUsd >= 0 ? 'Fuel Cost Saved' : 'Speed Fuel Penalty'}
             </span>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1.15rem', fontWeight: 800, color: bunkerSavingsUsd >= 0 ? '#34D399' : '#F87171' }}>
+            <div style={{ fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)", fontSize: '1.15rem', fontWeight: 800, color: bunkerSavingsUsd >= 0 ? (isLight ? '#16A34A' : '#34D399') : (isLight ? '#DC2626' : '#F87171') }}>
               {bunkerSavingsUsd >= 0 ? `+$${bunkerSavingsUsd.toLocaleString()}` : `-$${Math.abs(bunkerSavingsUsd).toLocaleString()}`}
             </div>
-            <span style={{ fontSize: '0.65rem', color: bunkerSavingsUsd >= 0 ? '#34D399' : '#F87171' }}>
+            <span style={{ fontSize: '0.65rem', color: isLight ? '#64748B' : '#94A3B8' }}>
               {bunkerSavingsUsd >= 0 ? `Net fuel conservation` : `Exceeds eco baseline`}
             </span>
           </div>
