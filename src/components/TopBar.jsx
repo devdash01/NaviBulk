@@ -2,9 +2,9 @@
 // Maximum ~60px header providing clean application context without dashboard clutter
 import React from 'react';
 import { useDecisionEngine, STAGE_ORDER, STAGE_METADATA } from '../context/DecisionContext.jsx';
-import { ShieldCheck, CheckCircle2, RefreshCw, Clock, FileText, ChevronRight } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, RefreshCw, Clock, FileText, ChevronRight, Home, Compass } from 'lucide-react';
 
-export default function TopBar({ onOpenMethodologyModal }) {
+export default function TopBar({ activeTab, onSelectTab, onOpenMethodologyModal }) {
   const {
     inputs,
     activeStage,
@@ -26,7 +26,7 @@ export default function TopBar({ onOpenMethodologyModal }) {
         zIndex: 40
       }}
     >
-      {/* ── 60px UPPER BAR ── */}
+      {/* ── 56px UPPER BAR ── */}
       <div 
         style={{
           height: '56px',
@@ -38,24 +38,69 @@ export default function TopBar({ onOpenMethodologyModal }) {
           flexWrap: 'nowrap'
         }}
       >
-        {/* LEFT: System Identity */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
+        {/* LEFT: System Identity with Official Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
           <div 
-            style={{
-              background: '#0F172A',
-              color: '#FFFFFF',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              padding: '0.22rem 0.55rem',
-              borderRadius: '4px',
-              letterSpacing: '0.02em'
-            }}
+            onClick={() => onSelectTab && onSelectTab('home')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer' }}
+            title="Go to Homepage"
           >
-            SAIL NaviBulk
+            <img 
+              src="/navibulk-logo.png" 
+              alt="SAIL NaviBulk Logo" 
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '6px',
+                objectFit: 'contain'
+              }} 
+            />
+            <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A', letterSpacing: '-0.01em' }}>
+              SAIL NaviBulk
+            </span>
           </div>
-          <span style={{ color: '#64748B', fontSize: '0.74rem', fontWeight: 600 }}>
-            SIH 26006
-          </span>
+
+          {/* Home vs Decision Navigation Pill */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: '#F1F5F9', padding: '0.2rem', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+            <button
+              onClick={() => onSelectTab && onSelectTab('home')}
+              style={{
+                background: activeTab === 'home' ? '#0F172A' : 'transparent',
+                color: activeTab === 'home' ? '#FFFFFF' : '#64748B',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}
+            >
+              <Home size={12} />
+              <span>Home</span>
+            </button>
+            <button
+              onClick={() => onSelectTab && onSelectTab('decision')}
+              style={{
+                background: activeTab === 'decision' ? '#0F172A' : 'transparent',
+                color: activeTab === 'decision' ? '#FFFFFF' : '#64748B',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}
+            >
+              <Compass size={12} />
+              <span>Decision Flow</span>
+            </button>
+          </div>
         </div>
 
         {/* CENTER: Active Cargo Requirement Pill */}

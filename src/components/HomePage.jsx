@@ -282,22 +282,20 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             userSelect: 'none'
           }}
         >
-          <div 
+          <img 
+            src="/navibulk-logo.png" 
+            alt="SAIL NaviBulk Logo" 
             style={{
-              width: '38px',
-              height: '38px',
+              width: '40px',
+              height: '40px',
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, var(--graphite-700) 0%, var(--graphite-800) 100%)',
-              border: '1px solid rgba(201, 151, 63, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              background: '#FFFFFF',
+              padding: '2px',
+              objectFit: 'contain',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
               flexShrink: 0
             }}
-          >
-            <Ship size={19} color="var(--brass)" />
-          </div>
+          />
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>

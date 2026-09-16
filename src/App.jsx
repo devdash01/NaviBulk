@@ -5,6 +5,7 @@ import { DecisionProvider, useDecisionEngine } from './context/DecisionContext.j
 import Sidebar from './components/Sidebar.jsx';
 import TopBar from './components/TopBar.jsx';
 import StageRouter from './components/StageRouter.jsx';
+import HomePage from './components/HomePage.jsx';
 import PortOperationsView from './components/PortOperationsView.jsx';
 import MethodologyDossierModal from './components/MethodologyDossierModal.jsx';
 
@@ -18,7 +19,7 @@ export default function App() {
 
 function AppWorkspace() {
   const { handleRequirementChange, setActiveStage } = useDecisionEngine();
-  const [activeTab, setActiveTab] = useState('decision'); // 'decision' | 'ports'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'decision' | 'ports'
   const [isMethodologyModalOpen, setIsMethodologyModalOpen] = useState(false);
 
   return (
@@ -34,6 +35,8 @@ function AppWorkspace() {
     >
       {/* 232px Desktop Minimal Workstation Sidebar */}
       <Sidebar
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
         onOpenPortsModal={() => setActiveTab('ports')}
         onOpenMethodologyModal={() => setIsMethodologyModalOpen(true)}
       />
@@ -51,6 +54,8 @@ function AppWorkspace() {
       >
         {/* Compact 56px Top Bar */}
         <TopBar 
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
           onOpenMethodologyModal={() => setIsMethodologyModalOpen(true)} 
         />
 
@@ -59,10 +64,33 @@ function AppWorkspace() {
           className="workspace-content" 
           style={{ 
             flex: 1, 
-            padding: '1.75rem 2rem',
+            padding: activeTab === 'home' ? 0 : '1.75rem 2rem',
             overflowY: 'auto'
           }}
         >
+          {activeTab === 'home' && (
+            <HomePage
+              onNavigate={(view) => {
+                if (view === 'ports') {
+                  setActiveTab('ports');
+                } else if (view === 'planner') {
+                  setActiveStage('requirement');
+                  setActiveTab('decision');
+                } else if (view === 'risks') {
+                  setActiveStage('feasibility');
+                  setActiveTab('decision');
+                } else {
+                  setActiveTab('decision');
+                }
+              }}
+              onConfigureVoyage={(params) => {
+                if (params) handleRequirementChange(params);
+                setActiveStage('requirement');
+                setActiveTab('decision');
+              }}
+            />
+          )}
+
           {activeTab === 'decision' && <StageRouter />}
 
           {activeTab === 'ports' && (
@@ -77,29 +105,31 @@ function AppWorkspace() {
         </main>
 
         {/* Restrained Institutional Footer */}
-        <footer 
-          style={{
-            borderTop: '1px solid #E2E8F0',
-            padding: '0.85rem 2rem',
-            fontSize: '0.73rem',
-            color: '#64748B',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            background: '#FFFFFF'
-          }}
-        >
-          <div>
-            Steel Authority of India Limited • Central Raw Materials Logistics Directorate
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span>ISO 9001 / IMO MEPC 76 Compliant</span>
-            <span>•</span>
-            <span style={{ color: '#16A34A', fontWeight: 600 }}>Decision Engine V2 Validated</span>
-          </div>
-        </footer>
+        {activeTab !== 'home' && (
+          <footer 
+            style={{
+              borderTop: '1px solid #E2E8F0',
+              padding: '0.85rem 2rem',
+              fontSize: '0.73rem',
+              color: '#64748B',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              background: '#FFFFFF'
+            }}
+          >
+            <div>
+              Steel Authority of India Limited • Central Raw Materials Logistics Directorate
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span>ISO 9001 / IMO MEPC 76 Compliant</span>
+              <span>•</span>
+              <span style={{ color: '#16A34A', fontWeight: 600 }}>Decision Engine V2 Validated</span>
+            </div>
+          </footer>
+        )}
       </div>
 
       {/* Mathematical Model Audit Dossier Modal */}
@@ -110,3 +140,4 @@ function AppWorkspace() {
     </div>
   );
 }
+

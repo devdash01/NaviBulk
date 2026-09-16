@@ -7,11 +7,14 @@ import {
   Compass, 
   Anchor, 
   ShieldCheck, 
-  ExternalLink 
+  ExternalLink,
+  Home
 } from 'lucide-react';
 import { useDecisionEngine, STAGE_ORDER, STAGE_METADATA } from '../context/DecisionContext.jsx';
 
 export default function Sidebar({ 
+  activeTab,
+  onSelectTab,
   onOpenPortsModal, 
   onOpenMethodologyModal 
 }) {
@@ -47,27 +50,27 @@ export default function Sidebar({
       {/* ── TOP SECTION ── */}
       <div>
         
-        {/* 1. BRAND HEADER */}
+        {/* 1. BRAND HEADER WITH OFFICIAL LOGO */}
         <div style={{ padding: '1.25rem 1.15rem 1rem', borderBottom: '1px solid #1E293B' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div 
+          <div 
+            onClick={() => onSelectTab && onSelectTab('home')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer' }}
+            title="Go to Homepage"
+          >
+            <img 
+              src="/navibulk-logo.png" 
+              alt="SAIL NaviBulk Logo" 
               style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '6px',
-                background: '#1E293B',
-                border: '1px solid #334155',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#38BDF8',
-                fontWeight: 900,
-                fontSize: '1.1rem',
-                flexShrink: 0
-              }}
-            >
-              ⚓
-            </div>
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: '#FFFFFF',
+                padding: '2px',
+                objectFit: 'contain',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              }} 
+            />
             <div>
               <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.01em', lineHeight: 1.15 }}>
                 SAIL NaviBulk
@@ -78,10 +81,37 @@ export default function Sidebar({
             </div>
           </div>
 
+          {/* Home Portal Button */}
+          <button
+            onClick={() => onSelectTab && onSelectTab('home')}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: activeTab === 'home' ? '#2563EB' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'home' ? '#FFFFFF' : '#94A3B8',
+              border: activeTab === 'home' ? '1px solid #3B82F6' : '1px solid #334155',
+              borderRadius: '5px',
+              padding: '0.45rem 0.65rem',
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              marginTop: '0.85rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Home size={13} />
+            <span>Home Overview</span>
+          </button>
+
           {/* + New Decision Button */}
-          <div style={{ display: 'flex', gap: '0.4rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
             <button
-              onClick={startNewDecision}
+              onClick={() => {
+                startNewDecision();
+                if (onSelectTab) onSelectTab('decision');
+              }}
               style={{
                 flex: 1,
                 background: '#2563EB',
@@ -104,7 +134,10 @@ export default function Sidebar({
             </button>
 
             <button
-              onClick={resetToDemoDecision}
+              onClick={() => {
+                resetToDemoDecision();
+                if (onSelectTab) onSelectTab('decision');
+              }}
               title="Reset to Australia → Paradip Benchmark Demo"
               style={{
                 background: '#1E293B',
@@ -148,14 +181,9 @@ export default function Sidebar({
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
             {STAGE_ORDER.map((stageId) => {
               const meta = STAGE_METADATA[stageId];
-              const isCurrent = activeStage === stageId;
+              const isCurrent = activeTab === 'decision' && activeStage === stageId;
               const status = stageStatuses[stageId] || 'not_started';
 
-              // Visual indicator states per spec:
-              // ✓ ANALYZED (subtle check)
-              // ● CURRENT (strong visual highlight)
-              // ○ NOT STARTED (muted circle)
-              // ⟳ REQUIRES REANALYSIS (warning/refresh icon)
               let iconSymbol = '○';
               let iconColor = '#475569';
 
@@ -173,7 +201,10 @@ export default function Sidebar({
               return (
                 <button
                   key={stageId}
-                  onClick={() => setActiveStage(stageId)}
+                  onClick={() => {
+                    if (onSelectTab) onSelectTab('decision');
+                    setActiveStage(stageId);
+                  }}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
