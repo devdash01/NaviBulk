@@ -52,8 +52,8 @@ export default function MarketStage() {
             <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
               ${lastHistoricalRate.toLocaleString()} <span style={{ fontSize: '0.72rem', fontWeight: 600 }}>/day</span>
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94A3B8', marginTop: '0.25rem' }}>
-              [Latest Available Index — Baltic Exchange]
+            <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '0.25rem' }}>
+              Baltic Exchange Benchmark
             </div>
           </div>
 
@@ -64,8 +64,8 @@ export default function MarketStage() {
             <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
               ${day0ForecastRate.toLocaleString()} <span style={{ fontSize: '0.72rem', fontWeight: 600 }}>/day</span>
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94A3B8', marginTop: '0.25rem' }}>
-              [Model Forecast — SARIMAX Origin]
+            <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '0.25rem' }}>
+              SARIMAX Econometric Origin
             </div>
           </div>
 

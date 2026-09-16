@@ -65,6 +65,10 @@ export function checkPortFeasibility(vesselClassKey, destinationPortKey, tonnage
     }
   }
 
+  const portDraft = berthRegime.maxDraft || 14.5;
+  const vesselDraft = vessel.draftReq || 13.8;
+  const clearanceM = parseFloat((portDraft - vesselDraft).toFixed(2));
+
   const feasible = destinationPortKey === 'haldia' ? (isDirectBerthFeasible || requiresSagarTransshipment) : isDirectBerthFeasible;
 
   return {
@@ -72,8 +76,10 @@ export function checkPortFeasibility(vesselClassKey, destinationPortKey, tonnage
     isDirectBerthFeasible,
     requiresSagarTransshipment,
     issues,
-    portDraft: berthRegime.maxDraft,
-    vesselDraft: vessel.draftReq,
+    portDraft,
+    vesselDraft,
+    vesselDraftM: vesselDraft,
+    clearanceM,
     portName: port.name,
     vesselName: vessel.name,
   };
@@ -110,7 +116,16 @@ export function rankFeasibleVessels({ cargoType, tonnage, originCountry, destina
       costPerTonneUsd: costResult.costPerTonneUsd,
       totalVoyageCostUsd: costResult.totalVoyageCostUsd,
       totalVoyageDays: costResult.totalVoyageDays,
-      feasibility,
+      dwt: vessel.avgDwt || vessel.dwtMax || 75000,
+      dwtMax: vessel.dwtMax,
+      draftReq: vessel.draftReq,
+      loaReq: vessel.loaReq,
+      beamReq: vessel.beamReq,
+      feasibility: {
+        ...feasibility,
+        vesselDraftM: vessel.draftReq,
+        clearanceM: feasibility.clearanceM,
+      },
       description: vessel.description,
     });
   });

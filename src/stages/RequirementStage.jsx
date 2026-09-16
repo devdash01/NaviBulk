@@ -226,8 +226,9 @@ export default function RequirementStage() {
 
           </div>
 
-          <div style={{ marginTop: '1.25rem', padding: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', fontSize: '0.73rem', color: '#64748B' }}>
-            <span style={{ fontWeight: 700, color: '#0F172A' }}>State Invalidation Notice:</span> Changing any parameter above invalidates downstream stages (Market, Feasibility, Economics, Base Plan, Procurement, Sources, Stress, Decision) and flags them as <em>Requires Reanalysis</em> to prevent stale recommendation display.
+          <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.72rem', color: '#64748B' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+            <span>Parameters synchronize live with downstream feasibility and economics engines.</span>
           </div>
         </div>
 
@@ -259,23 +260,25 @@ export default function RequirementStage() {
                 <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
                   {routeDistanceNm.toLocaleString()} <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>NM</span>
                 </div>
-                <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>[Matrix Lookup]</div>
+                <div style={{ fontSize: '0.68rem', color: '#2563EB', fontWeight: 600, marginTop: '0.2rem' }}>Direct Corridor</div>
               </div>
 
               <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.75rem' }}>
-                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Est. Transit @ 13kn</div>
+                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Sea Transit</div>
                 <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
                   {(routeDistanceNm / (13 * 24)).toFixed(1)} <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Days</span>
                 </div>
-                <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>[Voyage Assumption]</div>
+                <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '0.2rem' }}>@ 13.0 kn Speed</div>
               </div>
 
               <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.75rem' }}>
-                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Berth Max Draft</div>
+                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Berth Draft</div>
                 <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
                   {destDraft} <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>m</span>
                 </div>
-                <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>[Port Authority Limit]</div>
+                <div style={{ fontSize: '0.68rem', color: destPortInfo.requiresLightering ? '#B45309' : '#16A34A', fontWeight: 600, marginTop: '0.2rem' }}>
+                  {destPortInfo.requiresLightering ? 'Lightering Needed' : 'Deep Berth'}
+                </div>
               </div>
             </div>
 
@@ -291,24 +294,20 @@ export default function RequirementStage() {
                   <strong style={{ color: '#0F172A' }}>{destPortInfo.dischargeRateTpd?.toLocaleString() || 25000} TPD</strong>
                 </div>
                 <div>
-                  <span style={{ color: '#64748B' }}>Tidal Variation:</span>{' '}
+                  <span style={{ color: '#64748B' }}>Tidal Range:</span>{' '}
                   <strong style={{ color: '#0F172A' }}>{destPortInfo.tideVariationM || 2.2} m</strong>
                 </div>
                 <div>
-                  <span style={{ color: '#64748B' }}>Primary SAIL Plants:</span>{' '}
+                  <span style={{ color: '#64748B' }}>SAIL Plants:</span>{' '}
                   <strong style={{ color: '#0F172A' }}>{destPortInfo.servesPlants?.join(', ') || 'RSP, BSL, DSP'}</strong>
                 </div>
                 <div>
-                  <span style={{ color: '#64748B' }}>Lightering Requirement:</span>{' '}
+                  <span style={{ color: '#64748B' }}>Berthing Regime:</span>{' '}
                   <strong style={{ color: destPortInfo.requiresLightering ? '#B45309' : '#16A34A' }}>
-                    {destPortInfo.requiresLightering ? 'Mandatory Transshipment' : 'Direct Berth Discharge'}
+                    {destPortInfo.requiresLightering ? 'Anchorage Lightering' : 'Direct Berth'}
                   </strong>
                 </div>
               </div>
-            </div>
-
-            <div style={{ fontSize: '0.78rem', color: '#475569', lineHeight: 1.5 }}>
-              NaviBulk automatically verifies if the designated consignment fits within destination draft, beam, and LOA boundaries before evaluating Baltic freight rate curves.
             </div>
           </div>
 
