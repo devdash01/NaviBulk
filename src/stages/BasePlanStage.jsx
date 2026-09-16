@@ -21,10 +21,10 @@ export default function BasePlanStage() {
   const loadPort = FOREIGN_LOAD_PORTS[inputs.originCountry] || { portName: 'Nominated Load Berth', country: inputs.originCountry };
   const distanceOriginKey = inputs.originCountry === 'United States' ? 'US' : inputs.originCountry;
   const distanceNm = NAUTICAL_DISTANCE_MATRIX[distanceOriginKey]?.[inputs.destinationPortKey] || 4850;
-  const speedKnots = 13.0;
-  const transitDays = Number((distanceNm / (speedKnots * 24)).toFixed(1));
+  const speedKnots = inputs.speedKnots || 13.0;
+  const transitDays = baseDeliveredCost?.transitDays || Number((distanceNm / (speedKnots * 24)).toFixed(1));
 
-  const conclusionText = `BASE PLAN ESTABLISHED: Original source (${inputs.originCountry}) is fully optimized utilizing ${recommendedVessel?.vesselName || 'Panamax'} at $${baseDeliveredCost.totalLanded}/MT ($${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD). This plan represents the authoritative baseline against which alternative basins will be challenged in subsequent stages.`;
+  const conclusionText = `BASE PLAN ESTABLISHED: Original source (${inputs.originCountry}) is fully optimized utilizing ${recommendedVessel?.vesselName || 'Panamax'} at ${speedKnots.toFixed(1)} kn operating speed ($${baseDeliveredCost.totalLanded}/MT, $${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD). This plan represents the authoritative baseline against which alternative basins will be challenged in subsequent stages.`;
 
   return (
     <StageShell
@@ -171,6 +171,16 @@ export default function BasePlanStage() {
             </div>
             <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.2rem' }}>
               India → Southeast Asia Iron Ore return cargo match eligible
+            </div>
+          </div>
+
+          <div style={{ background: '#FFFFFF', border: '1px solid #86EFAC', borderRadius: '8px', padding: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+            <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>Bunker & Speed Optimization</div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#16A34A', marginTop: '0.2rem' }}>
+              {baseDeliveredCost?.curBurnTpd || 22.4} TPD @ {speedKnots.toFixed(1)} kn
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#166534', marginTop: '0.2rem' }}>
+              Savings: +${baseDeliveredCost?.speedBunkerSavingsUsd?.toLocaleString() || '0'} USD (-{baseDeliveredCost?.co2SavedTons || 0} MT CO₂)
             </div>
           </div>
 

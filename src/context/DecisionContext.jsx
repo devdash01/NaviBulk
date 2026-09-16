@@ -104,6 +104,7 @@ const DEFAULT_DEMO_INPUTS = {
   maxDraftTolerance: 14.5,
   vesselClass: 'panamax',
   riskTolerance: 'MEDIUM',
+  speedKnots: 13.0,
 };
 
 const ALL_ANALYZED_STATUSES = {
@@ -186,11 +187,17 @@ export function DecisionProvider({ children }) {
       maxDraftTolerance: 14.5,
       vesselClass: 'panamax',
       riskTolerance: 'MEDIUM',
+      speedKnots: 13.0,
     });
     setStageStatuses(NEW_DECISION_STATUSES);
     setActiveStage('requirement');
     setAdoptedCandidateBranch(null);
     setStressState({ freightPct: 0, congestionDays: 0, bunkerPct: 0, parcelSwingMt: 0 });
+  }, []);
+
+  // ── 7B. SET SPEED KNOTS (Hydrodynamic Speed Optimization) ──
+  const setSpeedKnots = useCallback((speed) => {
+    setInputs((prev) => ({ ...prev, speedKnots: Number(speed) }));
   }, []);
 
   // ── 8. RESET TO DEMO DECISION ──
@@ -301,15 +308,42 @@ export function DecisionProvider({ children }) {
     return routeRisks.riskCards.reduce((highest, curr) => (curr.score > highest.score ? curr : highest), routeRisks.riskCards[0]);
   }, [routeRisks]);
 
-  // 5. True Delivered Base Cost Breakdown
+  // 5. True Delivered Base Cost Breakdown (Dynamically linked to Hydrodynamic Speed & Bunker Burn)
   const baseDeliveredCost = useMemo(() => {
     const rawCost = recommendedVessel?.costPerTonneUsd || 18.20;
     const freightPortion = Number((rawCost * 0.70).toFixed(2));
-    const bunkerPortion = Number((rawCost * 0.18).toFixed(2));
+    
+    // Dynamic Bunker calculation via Admiralty Non-Linear Cubic Law (P ∝ V³)
+    const distanceOriginKey = inputs.originCountry === 'United States' ? 'US' : inputs.originCountry;
+    const distanceNm = NAUTICAL_DISTANCE_MATRIX[distanceOriginKey]?.[inputs.destinationPortKey] || 4850;
+    const vesselSpec = VESSEL_CLASSES[recommendedVessel?.vesselKey] || VESSEL_CLASSES.panamax;
+    const designSpeed = vesselSpec.avgSpeedKnots || 14.0;
+    const designBurnTpd = vesselSpec.bunkerBurnTpdLaden || 28.0;
+    const speed = inputs.speedKnots || 13.0;
+    const bunkerPrice = 829.50; // $/MT VLSFO
+
+    // Design baseline calculation
+    const baseSeaDays = Number((distanceNm / (designSpeed * 24)).toFixed(1));
+    const baseTotalBunkerTons = Number((baseSeaDays * designBurnTpd).toFixed(1));
+    const baseTotalBunkerCost = baseTotalBunkerTons * bunkerPrice;
+
+    // Actual operating speed calculation
+    const curSeaDays = Number((distanceNm / (speed * 24)).toFixed(1));
+    const curBurnTpd = Number((designBurnTpd * Math.pow(speed / designSpeed, 3)).toFixed(1));
+    const curTotalBunkerTons = Number((curSeaDays * curBurnTpd).toFixed(1));
+    const curTotalBunkerCost = curTotalBunkerTons * bunkerPrice;
+
+    // Direct bunker cost per MT of cargo
+    const bunkerPortion = Number((curTotalBunkerCost / (inputs.tonnage || 70000)).toFixed(2));
     const portDuesPortion = Number((rawCost * 0.07).toFixed(2));
     const lighteringFee = recommendedVessel?.feasibility?.requiresSagarTransshipment ? 4.20 : 0.0;
     const demurragePortion = Number((0.60).toFixed(2));
     const totalLanded = Number((freightPortion + bunkerPortion + portDuesPortion + lighteringFee + demurragePortion).toFixed(2));
+    
+    const speedBunkerSavingsUsd = Math.round(baseTotalBunkerCost - curTotalBunkerCost);
+    const speedBunkerSavingsPerMt = Number((speedBunkerSavingsUsd / (inputs.tonnage || 70000)).toFixed(2));
+    const fuelSavedTons = Math.max(0, Number((baseTotalBunkerTons - curTotalBunkerTons).toFixed(1)));
+    const co2SavedTons = Number((fuelSavedTons * 3.114).toFixed(1));
 
     return {
       freightPortion,
@@ -319,9 +353,21 @@ export function DecisionProvider({ children }) {
       demurragePortion,
       totalLanded,
       totalOutlayUsd: Math.round(totalLanded * inputs.tonnage),
-      totalOutlayInrCr: Number(((totalLanded * inputs.tonnage * 83.2) / 10000000).toFixed(2))
+      totalOutlayInrCr: Number(((totalLanded * inputs.tonnage * 83.2) / 10000000).toFixed(2)),
+      // Speed optimization dynamic outputs
+      operatingSpeed: speed,
+      designSpeed,
+      designBurnTpd,
+      curBurnTpd,
+      transitDays: curSeaDays,
+      baseTransitDays: baseSeaDays,
+      speedBunkerSavingsUsd,
+      speedBunkerSavingsPerMt,
+      fuelSavedTons,
+      co2SavedTons,
+      bunkerPrice
     };
-  }, [recommendedVessel, inputs.tonnage]);
+  }, [recommendedVessel, inputs.tonnage, inputs.originCountry, inputs.destinationPortKey, inputs.speedKnots]);
 
   // 6. Dynamic Commitment (BUY NOW vs WAIT vs PARTIAL LOCK)
   const commitmentDecision = useMemo(() => {
@@ -618,6 +664,7 @@ export function DecisionProvider({ children }) {
     handleRequirementChange,
     startNewDecision,
     resetToDemoDecision,
+    setSpeedKnots,
     adoptCandidateBranch,
     clearCandidateBranch,
     updateStressState,

@@ -30,10 +30,7 @@ import {
   LineChart,
   BarChart3,
   SearchCheck,
-  Check,
-  Gauge,
-  Leaf,
-  DollarSign
+  Check
 } from 'lucide-react';
 import { BUNKER_PRICE_VLSFO, COMMODITY_PINK_SHEET, HISTORICAL_SERIES } from '../data/freightData';
 import { EAST_COAST_PORTS, FOREIGN_LOAD_PORTS } from '../data/portConstraints';
@@ -50,9 +47,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
   const [displayedSavings, setDisplayedSavings] = useState(0);
   const [isAutoCycling, setIsAutoCycling] = useState(true);
   const [settlePulse, setSettlePulse] = useState(false);
-  
-  // Speed & Eco-Steaming Optimization state
-  const [operatingSpeed, setOperatingSpeed] = useState(12.4);
 
   const isInitialLoadRef = useRef(true);
   const animationRef = useRef(null);
@@ -152,44 +146,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
 
   const activeCorridor = corridors.find(c => c.id === activeCorridorKey) || corridors[0];
 
-  // Hydrodynamic speed optimization calculations (Admiralty Non-Linear Cubic Law: P ∝ V³)
-  const speedCalc = useMemo(() => {
-    const baseSpeed = 14.0;
-    const baseBurnTpd = 28.0;
-    const bunkerPrice = BUNKER_PRICE_VLSFO || 829.50;
-    const dist = activeCorridor.distanceNm;
-
-    // Design baseline
-    const baseSeaDays = Number((dist / (baseSpeed * 24)).toFixed(1));
-    const baseBunkerTotalTons = baseSeaDays * baseBurnTpd;
-
-    // Current operating speed calculations
-    const curBurnTpd = Number((baseBurnTpd * Math.pow(operatingSpeed / baseSpeed, 3)).toFixed(1));
-    const curSeaDays = Number((dist / (operatingSpeed * 24)).toFixed(1));
-    const curBunkerTotalTons = curSeaDays * curBurnTpd;
-
-    // Savings
-    const fuelSavedTons = Math.max(0, Number((baseBunkerTotalTons - curBunkerTotalTons).toFixed(1)));
-    const bunkerCostSavedUsd = Math.round(fuelSavedTons * bunkerPrice);
-    const co2ReductionTons = Number((fuelSavedTons * 3.114).toFixed(1));
-    const burnReductionPct = Number((((baseBurnTpd - curBurnTpd) / baseBurnTpd) * 100).toFixed(1));
-    const additionalSteamingHours = Math.round((curSeaDays - baseSeaDays) * 24);
-
-    return {
-      baseSpeed,
-      baseBurnTpd,
-      baseSeaDays,
-      curBurnTpd,
-      curSeaDays,
-      fuelSavedTons,
-      bunkerCostSavedUsd,
-      co2ReductionTons,
-      burnReductionPct,
-      additionalSteamingHours,
-      bunkerPrice
-    };
-  }, [activeCorridor, operatingSpeed]);
-
   // Live number count-up for hero savings
   useEffect(() => {
     const target = activeCorridor.timingAlphaUsd || 87421;
@@ -256,15 +212,14 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
     { name: 'IISCO Steel Plant (ISP)', location: 'Burnpur, West Bengal', desc: '2.5 MTPA Capacity • Sourced via Dhamra Port' }
   ];
 
-  const handleLaunchPlanner = (corridor = activeCorridor, customSpeed = operatingSpeed) => {
+  const handleLaunchPlanner = (corridor = activeCorridor) => {
     if (onConfigureVoyage) {
       onConfigureVoyage({
         originCountry: corridor.origin,
         destinationPortKey: corridor.destination,
         cargoType: corridor.commodity,
         tonnage: corridor.vesselClass === 'capesize' ? 150000 : 70000,
-        vesselClass: corridor.vesselClass,
-        speedKnots: customSpeed
+        vesselClass: corridor.vesselClass
       });
     }
     onNavigate('planner');
@@ -279,7 +234,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
       destination: 'Paradip Port Authority (Berth CB-1)',
       status: 'Steaming in Deep Water (Bay of Bengal)',
       eta: '18 Sep 2026 • 06:00 IST',
-      speed: `${operatingSpeed.toFixed(1)} knots (Eco-speed profile)`,
+      speed: '12.4 knots (Eco-speed profile)',
       draft: '14.20m (Safely within Paradip 14.5m max draft limit [Notice 750])',
       lightering: '100% Direct Berth Clearance (Zero Transshipment Penalty)',
       modelSavings: '+$87,421 V2 Model-Optimized COA Contract Hedge'
@@ -676,22 +631,55 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
       </header>
 
 
-      {/* ── CRISP HERO SECTION (Star Number + Live Corridor Switcher) ── */}
+      {/* ── CINEMATIC FULL-BLEED PHOTOGRAPHIC HERO (sail_bulk_hero.jpg Restored + High Contrast Visibility) ── */}
       <section 
         style={{
           position: 'relative',
           width: '100%',
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 65%, #F1F5F9 100%)',
+          minHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          overflow: 'hidden',
+          background: '#0F172A',
           borderBottom: '1px solid #E2E8F0',
-          padding: '2.5rem 3.5rem 3rem'
+          padding: '2.75rem 3.5rem 2.5rem'
         }}
       >
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2.25rem' }}>
+        {/* CSS Ken Burns Background Layer — Authentic dry bulk carrier image */}
+        <div 
+          className="ken-burns-hero"
+          style={{
+            position: 'absolute',
+            inset: '-4%',
+            width: '108%',
+            height: '108%',
+            backgroundImage: `url('/sail_bulk_hero.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 50%',
+            filter: 'brightness(0.46) contrast(1.18) saturate(0.88)',
+            zIndex: 0,
+            pointerEvents: 'none'
+          }}
+        />
+
+        {/* High-Contrast Gradient Scrim: Guarantees 100% text legibility */}
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.65) 50%, rgba(15, 23, 42, 0.94) 100%)',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}
+        />
+
+        <div style={{ maxWidth: '1400px', width: '100%', margin: '0 auto', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Corridor Live Switcher Bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.74rem', fontWeight: 700, color: '#B45309', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#B45309' }} />
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.74rem', fontWeight: 800, color: '#F59E0B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59E0B' }} />
               <span>Commercial Maritime Econometric Intelligence Console</span>
             </div>
 
@@ -701,23 +689,24 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
+                background: 'rgba(15, 23, 42, 0.85)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
                 padding: '0.25rem 0.35rem',
                 borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
               }}
               onMouseEnter={() => setIsAutoCycling(false)}
               onMouseLeave={() => setIsAutoCycling(true)}
             >
-              <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', padding: '0 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', padding: '0 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span 
                   style={{ 
                     width: '6px', 
                     height: '6px', 
                     borderRadius: '50%', 
-                    background: isAutoCycling ? '#16A34A' : '#D97706',
-                    boxShadow: isAutoCycling ? '0 0 6px #16A34A' : 'none'
+                    background: isAutoCycling ? '#10B981' : '#F59E0B',
+                    boxShadow: isAutoCycling ? '0 0 6px #10B981' : 'none'
                   }} 
                 />
                 <span>Active Route:</span>
@@ -733,13 +722,13 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                       setTimeout(() => setIsAutoCycling(true), 8000);
                     }}
                     style={{
-                      background: isSelected ? '#0F172A' : 'transparent',
-                      color: isSelected ? '#FFFFFF' : '#334155',
-                      border: `1px solid ${isSelected ? '#0F172A' : 'transparent'}`,
+                      background: isSelected ? '#B45309' : 'transparent',
+                      color: isSelected ? '#FFFFFF' : '#CBD5E1',
+                      border: `1px solid ${isSelected ? '#F59E0B' : 'transparent'}`,
                       borderRadius: '5px',
                       padding: '0.4rem 0.8rem',
                       fontSize: '0.78rem',
-                      fontWeight: isSelected ? 700 : 500,
+                      fontWeight: isSelected ? 800 : 500,
                       cursor: 'pointer',
                       transition: 'all 0.16s ease'
                     }}
@@ -762,17 +751,17 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
           >
             {/* Left Column: Star Savings Number & RouteLine */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', position: 'relative' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.35rem' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.35rem' }}>
                 Global Dry Bulk • DecisionEngineV2 Projection
               </div>
 
-              <h1 style={{ fontSize: 'clamp(1.6rem, 2.4vw, 2.1rem)', fontWeight: 800, color: '#0F172A', margin: '0 0 0.85rem 0', lineHeight: 1.25, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: 'clamp(1.7rem, 2.6vw, 2.3rem)', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.25, letterSpacing: '-0.02em', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                 Model-optimized chartering advantage
               </h1>
 
               {/* ROUTE LINE ARC BEHIND NUMBER */}
               <div style={{ position: 'relative', width: '100%', margin: '0.25rem 0 1rem 0' }}>
-                <div style={{ position: 'absolute', top: '-60px', left: '-20px', width: '110%', height: '220px', zIndex: 0, opacity: 0.85, pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', top: '-60px', left: '-20px', width: '110%', height: '220px', zIndex: 0, opacity: 0.9, pointerEvents: 'none' }}>
                   <RouteLine 
                     variant="home" 
                     corridor={activeCorridor}
@@ -792,22 +781,23 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                     letterSpacing: '-0.03em'
                   }}
                 >
-                  <span style={{ fontSize: 'clamp(2.4rem, 3.8vw, 3.5rem)', fontWeight: 800, color: '#B45309' }}>
+                  <span style={{ fontSize: 'clamp(2.4rem, 3.8vw, 3.5rem)', fontWeight: 800, color: '#F59E0B' }}>
                     +$
                   </span>
                   <span 
                     style={{ 
                       fontSize: 'clamp(3.2rem, 6.5vw, 6.2rem)', 
                       fontWeight: 800, 
-                      color: '#0F172A',
+                      color: '#F59E0B',
                       fontFamily: "var(--font-mono)",
                       fontVariantNumeric: 'tabular-nums',
+                      textShadow: '0 4px 20px rgba(0,0,0,0.8)',
                       transition: 'color 200ms ease'
                     }}
                   >
                     {displayedSavings.toLocaleString()}
                   </span>
-                  <span style={{ fontSize: 'clamp(0.95rem, 1.3vw, 1.25rem)', fontWeight: 600, color: '#64748B', fontFamily: "var(--font-sans)", letterSpacing: 'normal' }}>
+                  <span style={{ fontSize: 'clamp(0.95rem, 1.3vw, 1.25rem)', fontWeight: 600, color: '#94A3B8', fontFamily: "var(--font-sans)", letterSpacing: 'normal' }}>
                     / voyage
                   </span>
                 </div>
@@ -816,10 +806,11 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
               {/* Supporting Route Context Badges */}
               <div 
                 style={{
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '8px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '1.25rem',
@@ -830,32 +821,32 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                  <div style={{ fontSize: '0.66rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                     Active Route & Steaming
                   </div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', fontFamily: "var(--font-mono)" }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFFFFF', fontFamily: "var(--font-mono)" }}>
                     {activeCorridor.label} ({activeCorridor.distanceNm.toLocaleString()} nm • {activeCorridor.steamingDays}d)
                   </div>
                 </div>
 
-                <div style={{ width: '1px', height: '26px', background: '#E2E8F0' }} />
+                <div style={{ width: '1px', height: '26px', background: 'rgba(255, 255, 255, 0.15)' }} />
 
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                  <div style={{ fontSize: '0.66rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                     Vessel Class & Cargo
                   </div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#B45309' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F59E0B' }}>
                     {activeCorridor.vesselName}
                   </div>
                 </div>
 
-                <div style={{ width: '1px', height: '26px', background: '#E2E8F0' }} />
+                <div style={{ width: '1px', height: '26px', background: 'rgba(255, 255, 255, 0.15)' }} />
 
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                  <div style={{ fontSize: '0.66rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                     1-Day Forecast MAPE
                   </div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#16A34A', fontFamily: "var(--font-mono)" }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34D399', fontFamily: "var(--font-mono)" }}>
                     1.81% [XGBoost Log-Return]
                   </div>
                 </div>
@@ -866,25 +857,26 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             {/* Right Column: Narrative Card */}
             <div 
               style={{
-                background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
+                background: 'rgba(15, 23, 42, 0.88)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '10px',
                 padding: '2.25rem',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start'
               }}
             >
-              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
                 SAIL NaviBulk Enterprise
               </div>
 
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.85rem 0', lineHeight: 1.35 }}>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.35 }}>
                 The intelligent operating system for Indian dry bulk logistics.
               </h2>
 
-              <p style={{ fontSize: '0.94rem', color: '#334155', lineHeight: 1.65, margin: '0 0 1.75rem 0', fontWeight: 400 }}>
+              <p style={{ fontSize: '0.94rem', color: '#CBD5E1', lineHeight: 1.65, margin: '0 0 1.75rem 0', fontWeight: 400 }}>
                 From econometric Baltic freight forecasting to draft-cleared berth routing, SAIL NaviBulk eliminates multi-hundred-thousand-dollar offshore lightering penalties across 7 East Coast Indian ports with empirical certainty.
               </p>
 
@@ -904,7 +896,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.65rem',
-                    boxShadow: '0 2px 8px rgba(180, 83, 9, 0.3)',
+                    boxShadow: '0 2px 8px rgba(180, 83, 9, 0.4)',
                     transition: 'all 0.15s ease'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = '#92400E'}
@@ -917,9 +909,9 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 <button 
                   onClick={() => onNavigate('ports')}
                   style={{
-                    background: '#F8FAFC',
-                    color: '#0F172A',
-                    border: '1px solid #CBD5E1',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
                     borderRadius: '6px',
                     padding: '0.85rem 1.55rem',
                     fontSize: '0.92rem',
@@ -927,17 +919,17 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#F8FAFC'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.16)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'}
                 >
                   Inspect Port Waterlines
                 </button>
               </div>
 
               {/* Berth Status Badge */}
-              <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #E2E8F0', width: '100%', fontSize: '0.78rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <CheckCircle2 size={16} color="#16A34A" />
-                <span>Status: <strong style={{ color: '#0F172A' }}>{activeCorridor.draftStatus}</strong></span>
+              <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.12)', width: '100%', fontSize: '0.78rem', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <CheckCircle2 size={16} color="#34D399" />
+                <span>Status: <strong style={{ color: '#F8FAFC' }}>{activeCorridor.draftStatus}</strong></span>
               </div>
             </div>
 
@@ -990,223 +982,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
           </div>
         </div>
       </div>
-
-
-      {/* ── PROMINENT FEATURE: HYDRODYNAMIC SPEED & ECO-STEAMING OPTIMIZATION ── */}
-      <section 
-        style={{ 
-          padding: '4.5rem 3.5rem', 
-          background: '#FFFFFF', 
-          borderBottom: '1px solid #E2E8F0' 
-        }}
-      >
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2.5rem' }}>
-            <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.74rem', fontWeight: 800, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
-                <Gauge size={16} />
-                <span>Hydrodynamic Propulsion Console • IMO MEPC 76 Compliant</span>
-              </div>
-              <h2 style={{ fontSize: 'clamp(1.8rem, 2.5vw, 2.3rem)', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-                Speed & Eco-Steaming Bunker Optimizer
-              </h2>
-              <p style={{ fontSize: '0.98rem', color: '#475569', margin: '0.4rem 0 0 0', maxWidth: '780px' }}>
-                Admiralty Cubic Law ($P \propto V^3$): Vessel fuel consumption increases with the cube of steaming speed. Reducing speed by just 1.6 knots slashes daily bunker burn by <strong>-{speedCalc.burnReductionPct}%</strong>, yielding tens of thousands of dollars in direct voyage savings.
-              </p>
-            </div>
-
-            {/* Quick Speed Preset Buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748B', marginRight: '0.3rem' }}>Presets:</span>
-              {[
-                { label: 'Super Eco (11.5 kn)', kn: 11.5 },
-                { label: '★ Optimal Eco (12.4 kn)', kn: 12.4, primary: true },
-                { label: 'Design (14.0 kn)', kn: 14.0 },
-                { label: 'Express (15.0 kn)', kn: 15.0 }
-              ].map(preset => (
-                <button
-                  key={preset.kn}
-                  onClick={() => setOperatingSpeed(preset.kn)}
-                  style={{
-                    background: operatingSpeed === preset.kn ? (preset.primary ? '#16A34A' : '#0F172A') : '#F1F5F9',
-                    color: operatingSpeed === preset.kn ? '#FFFFFF' : '#334155',
-                    border: '1px solid',
-                    borderColor: operatingSpeed === preset.kn ? 'transparent' : '#CBD5E1',
-                    borderRadius: '6px',
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.76rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Speed Control Panel + KPI Cards */}
-          <div 
-            style={{
-              background: '#F8FAFC',
-              border: '1.5px solid #E2E8F0',
-              borderRadius: '12px',
-              padding: '2rem',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '2rem'
-            }}
-          >
-            {/* Speed Slider Control Bar */}
-            <div style={{ background: '#FFFFFF', padding: '1.25rem 1.75rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <Zap size={18} color="#D97706" />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Adjust Steaming Speed for Corridor: <span style={{ color: '#2563EB' }}>{activeCorridor.label} ({activeCorridor.distanceNm.toLocaleString()} nm)</span>
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', fontFamily: "var(--font-mono)" }}>
-                    {operatingSpeed.toFixed(1)} Knots
-                  </span>
-                  <span style={{
-                    fontSize: '0.72rem',
-                    fontWeight: 800,
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '4px',
-                    background: operatingSpeed === 12.4 ? '#DCFCE7' : operatingSpeed <= 12.0 ? '#DBEAFE' : operatingSpeed <= 14.0 ? '#FEF3C7' : '#FEE2E2',
-                    color: operatingSpeed === 12.4 ? '#166534' : operatingSpeed <= 12.0 ? '#1E40AF' : operatingSpeed <= 14.0 ? '#92400E' : '#991B1B',
-                    border: '1px solid',
-                    borderColor: operatingSpeed === 12.4 ? '#86EFAC' : '#CBD5E1'
-                  }}>
-                    {operatingSpeed === 12.4 ? '★ OPTIMAL ECO-STEAM' : operatingSpeed <= 12.0 ? 'SUPER ECO' : operatingSpeed === 14.0 ? 'DESIGN BASELINE' : 'HIGH EMISSIONS'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Range Input Slider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', fontFamily: "var(--font-mono)" }}>10.5 kn</span>
-                <input 
-                  type="range"
-                  min="10.5"
-                  max="16.0"
-                  step="0.1"
-                  value={operatingSpeed}
-                  onChange={(e) => setOperatingSpeed(parseFloat(e.target.value))}
-                  style={{
-                    flex: 1,
-                    accentColor: '#2563EB',
-                    height: '8px',
-                    cursor: 'pointer'
-                  }}
-                />
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', fontFamily: "var(--font-mono)" }}>16.0 kn</span>
-              </div>
-            </div>
-
-            {/* 4 Interactive Hydrodynamic KPI Metric Tiles */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
-              
-              {/* Tile 1: Fuel Consumption Rate */}
-              <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Ship size={14} color="#2563EB" />
-                  <span>Daily Fuel Consumption</span>
-                </div>
-                <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0F172A', fontFamily: "var(--font-mono)" }}>
-                  {speedCalc.curBurnTpd} <span style={{ fontSize: '0.9rem', color: '#64748B' }}>TPD</span>
-                </div>
-                <div style={{ fontSize: '0.76rem', color: speedCalc.burnReductionPct >= 0 ? '#16A34A' : '#DC2626', fontWeight: 700, marginTop: '0.25rem' }}>
-                  {speedCalc.burnReductionPct >= 0 ? `-${speedCalc.burnReductionPct}% vs 28.0 TPD Standard` : `+${Math.abs(speedCalc.burnReductionPct)}% High Burn`}
-                </div>
-              </div>
-
-              {/* Tile 2: Direct Voyage Bunker Cost Savings */}
-              <div style={{ background: '#FFFFFF', border: '1px solid #86EFAC', borderRadius: '10px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(22, 163, 74, 0.08)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <DollarSign size={14} color="#16A34A" />
-                  <span>Bunker Fuel Savings</span>
-                </div>
-                <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#16A34A', fontFamily: "var(--font-mono)" }}>
-                  +${speedCalc.bunkerCostSavedUsd.toLocaleString()}
-                </div>
-                <div style={{ fontSize: '0.76rem', color: '#64748B', marginTop: '0.25rem' }}>
-                  {speedCalc.fuelSavedTons > 0 ? `${speedCalc.fuelSavedTons} MT VLSFO Saved @ $${speedCalc.bunkerPrice}/t` : 'Standard baseline cost'}
-                </div>
-              </div>
-
-              {/* Tile 3: Steaming Days & Laycan Synchronization */}
-              <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Clock size={14} color="#D97706" />
-                  <span>Steaming Transit Time</span>
-                </div>
-                <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0F172A', fontFamily: "var(--font-mono)" }}>
-                  {speedCalc.curSeaDays} <span style={{ fontSize: '0.9rem', color: '#64748B' }}>Days</span>
-                </div>
-                <div style={{ fontSize: '0.76rem', color: '#334155', marginTop: '0.25rem', fontWeight: 600 }}>
-                  {speedCalc.additionalSteamingHours > 0 ? `+${speedCalc.additionalSteamingHours}h (Within 14D Laycan)` : `Standard (${speedCalc.baseSeaDays}d)`}
-                </div>
-              </div>
-
-              {/* Tile 4: Carbon Footprint Abatement */}
-              <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Leaf size={14} color="#059669" />
-                  <span>CO₂ Emission Abatement</span>
-                </div>
-                <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#059669', fontFamily: "var(--font-mono)" }}>
-                  -{speedCalc.co2ReductionTons} <span style={{ fontSize: '0.9rem', color: '#64748B' }}>MT</span>
-                </div>
-                <div style={{ fontSize: '0.76rem', color: '#64748B', marginTop: '0.25rem' }}>
-                  IMO CII Rating Improvement
-                </div>
-              </div>
-
-            </div>
-
-            {/* Bottom Actions Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#475569' }}>
-                <ShieldCheck size={16} color="#16A34A" />
-                <span>Calculated via Admiralty Formula ($P_1/P_2 = (V_1/V_2)^3$) validated for {activeCorridor.vesselName}.</span>
-              </div>
-
-              <button
-                onClick={() => handleLaunchPlanner(activeCorridor, operatingSpeed)}
-                style={{
-                  background: '#2563EB',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '0.65rem 1.4rem',
-                  fontSize: '0.86rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#1D4ED8'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#2563EB'}
-              >
-                <span>Apply {operatingSpeed.toFixed(1)} kn Speed to Voyage Planner</span>
-                <ArrowRight size={15} />
-              </button>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
 
 
       {/* ── SECTION 1: "WHAT WE DO" (Clean Editorial Cards) ── */}

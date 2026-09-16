@@ -49,6 +49,7 @@ export default function DecisionStage() {
   const whyBullets = [
     `Physical Feasibility: ${recommendedVessel?.vesselName || 'Panamax'} full-load draft (${recommendedVessel?.feasibility?.vesselDraftM}m) satisfies ${destPort.name} maximum berth draft (${destDraft}m) with +${recommendedVessel?.feasibility?.clearanceM}m Under-Keel Clearance, avoiding Sagar lightering surcharges.`,
     `Delivered Cost Optimization: Landed outcome calculated at $${baseDeliveredCost.totalLanded}/MT (total outlay $${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD), minimizing true voyage expenditure across ocean freight, bunker, port tariffs, and demurrage.`,
+    `Hydrodynamic Speed Optimization: Operating speed of ${(baseDeliveredCost.operatingSpeed || 13.0).toFixed(1)} kn achieves ${baseDeliveredCost.curBurnTpd || 22.4} TPD fuel burn (saving +$${(baseDeliveredCost.speedBunkerSavingsUsd || 0).toLocaleString()} USD vs design speed), arriving safely within laycan in ${baseDeliveredCost.transitDays} sea days.`,
     `Forward Freight Hedging: Forward ${subIndexKey} curve projects a ${forecastSlopePct > 0 ? `+${forecastSlopePct}% upward trajectory` : `${forecastSlopePct}% softening curve`}, validating the ${commitmentDecision.action} recommendation (${commitmentDecision.lockPct}% period coverage / ${commitmentDecision.spotPct}% spot liquidity).`,
     `Corridor Risk Factor: Primary operational hazard identified as "${primaryRisk.title}" (${primaryRisk.score}/100 - ${primaryRisk.level} Risk), accounted for within the voyage laytime and demurrage allowance.`
   ];
