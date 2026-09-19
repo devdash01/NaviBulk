@@ -193,7 +193,7 @@ class AICopilotRequest(BaseModel):
 @app.post("/api/ai/copilot")
 def query_ai_copilot(req: AICopilotRequest):
     """
-    AI Decision Copilot & XAI Reasoning Engine for SAIL NaviBulk (SIH 26006).
+    AI Decision Copilot & XAI Reasoning Engine for SAIL NaviBulk.
     Answers questions using Gemini LLM if API key is provided, or uses our high-fidelity
     built-in domain neural expert engine grounded in maritime physics, Baltic indexes, and port drafts.
     """
@@ -215,7 +215,7 @@ def query_ai_copilot(req: AICopilotRequest):
     # If user provided a Gemini API Key, use Google Gemini REST API with domain grounding
     if api_key and len(api_key) > 10:
         try:
-            system_prompt = f"""You are the SAIL NaviBulk AI Decision Copilot (SIH Problem Statement #26006).
+            system_prompt = f"""You are the SAIL NaviBulk AI Decision Copilot.
 You are an expert dry bulk freight chartering strategist and maritime economist advising Steel Authority of India Limited (SAIL).
 Current Active Scenario:
 - Recommended Vessel Class: {vessel} (75,000 DWT)
@@ -275,13 +275,13 @@ Provide an authoritative, mathematically grounded, structured explanation (using
         except Exception as err:
             print(f"[NOTE] Gemini API call error, falling back to Domain Neural Engine: {err}")
 
-    # Comprehensive Conversational & Domain Intent Engine (SIH 26006)
+    # Comprehensive Conversational & Domain Intent Engine
     visual_cards = []
 
     # 1. Greetings & Conversational Intro
     if q_lower in ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening", "yo", "sup"] or "who are you" in q_lower or "what can you do" in q_lower or "help" == q_lower:
         reply = f"""**Hello! I am your 24/7 SAIL NaviCopilot Maritime AI.**
-I am an expert decision intelligence strategist built for **SIH Problem Statement #26006**.
+I am an expert decision intelligence strategist built for **Steel Authority of India Limited (SAIL)**.
 
 **Here is what I can do for you:**
 • **Analyze Vessel Suitability:** Compare Panamax, Capesize, Supramax, and Handysize across all 7 Indian East Coast ports.
@@ -463,10 +463,10 @@ What would you like to explore today?"""
             }
         ]
 
-    # 9. Problem Statement 26006
-    elif "problem statement" in q_lower or "26006" in q_lower or "sih" in q_lower or "objective" in q_lower:
-        reply = f"""**SIH Problem Statement #26006 Overview & Architecture:**
-• **Title:** *Development of an Intelligent Freight Forecasting Model for Optimized Vessel Chartering and Bulk Cargo Procurement from Overseas to East Coast of India*.
+    # 9. Problem Statement & Architecture
+    elif "problem statement" in q_lower or "26006" in q_lower or "sih" in q_lower or "objective" in q_lower or "architecture" in q_lower:
+        reply = f"""**SAIL NaviBulk Commercial Maritime Decision Architecture:**
+• **Title:** *Intelligent Freight Forecasting Model for Optimized Vessel Chartering and Bulk Cargo Procurement for East Coast of India*.
 • **Core Problem:** SAIL charters dry bulk carriers for millions of tonnes of coking coal and limestone annually. Traditional daily spot market chartering is reactive, volatile, and misses cost-saving opportunities.
 • **NaviBulk AI Solution:**
   1. **Ensemble Time-Series Machine Learning:** SARIMA + XGBoost + GARCH(1,1) forward freight sub-index forecasting (30D & 90D horizons) across BCI, BPI, BSI, and BHSI.
@@ -474,8 +474,8 @@ What would you like to explore today?"""
   3. **Non-Linear Hydrodynamic Propulsion:** IMO Admiralty Cubic Law ($V^3$) speed-fuel optimization.
   4. **Contract Structuring:** Optimal choice between Spot Fixtures, 12-Month Period COA, and Index-Linked contracts.
   5. **Risk Defense Shield:** BIMCO Virtual Arrival 2011, Monsoon Weather Laycan Extension Riders, and Triangular Backhaul Monetization."""
-        model_used = "SIH 26006 Maritime Domain Knowledge Engine"
-        confidence = "100% Problem Statement Alignment"
+        model_used = "SAIL Maritime Domain Knowledge Engine"
+        confidence = "100% Architecture Alignment"
         visual_cards = [
             {
                 "type": "kpi_grid",
@@ -787,12 +787,12 @@ def get_live_marine_weather(lat: float = 20.26, lon: float = 86.67, port_name: s
         }
 
 # ============================================================
-# V2 Decision Intelligence API Endpoint (SIH 26006)
+# V2 Decision Intelligence API Endpoint
 # ============================================================
 @app.post("/api/v2/recommendation", response_model=RecommendationResponseV2)
 def get_v2_recommendation(req: RecommendationRequestV2):
     """
-    SIH 26006 V2 Decision Engine:
+    V2 Decision Engine:
     Answers: Given a cargo requirement today, what vessel should SAIL use,
     from which origin, to which East Coast Indian port, under which contract strategy,
     and when should it be fixed, so that expected delivered procurement cost is minimized

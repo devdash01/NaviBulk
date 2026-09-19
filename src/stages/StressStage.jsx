@@ -1,7 +1,7 @@
 // SAIL NaviBulk — Stage 08: Stress Sensitivity Testing
-// Tests robustness of base plan under severe market and operational shocks
+// Tests robustness of base plan under severe market and operational shocks with formula-driven hedge absorption
 import React from 'react';
-import { useDecisionEngine } from '../context/DecisionContext.jsx';
+import { useDecisionEngine, STRESS_PRESETS } from '../context/DecisionContext.jsx';
 import StageShell from '../components/StageShell.jsx';
 import { 
   Sliders, 
@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Sparkles,
   ArrowRight,
-  TrendingDown
+  TrendingDown,
+  Activity
 } from 'lucide-react';
 
 export default function StressStage() {
@@ -24,6 +25,7 @@ export default function StressStage() {
     stressState,
     updateStressState,
     resetStressState,
+    applyStressPreset,
     stressedEconomics,
     advanceStage
   } = useDecisionEngine();
@@ -31,55 +33,64 @@ export default function StressStage() {
   const isStressed = stressState.freightPct !== 0 || stressState.congestionDays !== 0 ||
     stressState.bunkerPct !== 0 || stressState.parcelSwingMt !== 0;
 
-  // Compute Total Cost Optimization and Capital Protected by NaviBulk Hedges
+  // Exact formula-driven financial figures from engine
   const grossShockDeltaUsd = Math.round(stressedEconomics.stressedTotalOutlayUsd - baseDeliveredCost.totalOutlayUsd);
   const costDeltaPerMt = stressedEconomics.costDelta || 0;
   
-  // NaviBulk's hedges (COA Index Cap, Berth Diversion, Eco-Steaming) absorb ~65% of upward market shocks
-  const hedgedMitigationSavingsUsd = grossShockDeltaUsd > 0 ? Math.round(grossShockDeltaUsd * 0.65) : 0;
-  const hedgedMitigationPerMt = costDeltaPerMt > 0 ? Number((costDeltaPerMt * 0.65).toFixed(2)) : 0;
-  const hedgedMitigationInrCr = Number(((hedgedMitigationSavingsUsd * 83.2) / 10000000).toFixed(2));
-  const hedgedTotalOutlayUsd = grossShockDeltaUsd > 0 
-    ? Math.round(baseDeliveredCost.totalOutlayUsd + (grossShockDeltaUsd * 0.35))
-    : stressedEconomics.stressedTotalOutlayUsd;
-  const hedgedLandedCost = costDeltaPerMt > 0
-    ? Number((baseDeliveredCost.totalLanded + (costDeltaPerMt * 0.35)).toFixed(2))
-    : stressedEconomics.newLanded;
+  const hedgedMitigationSavingsUsd = stressedEconomics.protectedCapitalUsd || 0;
+  const hedgedMitigationPerMt = stressedEconomics.protectedCapitalPerMt || 0;
+  const hedgedMitigationInrCr = stressedEconomics.protectedCapitalInrCr || 0;
+  const hedgedTotalOutlayUsd = stressedEconomics.hedgedTotalOutlayUsd;
+  const hedgedLandedCost = stressedEconomics.hedgedLanded;
 
   const conclusionText = isStressed
-    ? `Under active sensitivity stress, delivered cost shifts from $${baseDeliveredCost.totalLanded}/MT to $${stressedEconomics.newLanded}/MT (${costDeltaPerMt >= 0 ? `+$${costDeltaPerMt}` : `-$${Math.abs(costDeltaPerMt)}`}/MT). Without NaviBulk, unhedged spot exposure increases budget by $${Math.abs(grossShockDeltaUsd).toLocaleString()} USD. NaviBulk's adaptive recommendation (${stressedEconomics.stressedRecommendation}) caps exposure, protecting +$${hedgedMitigationSavingsUsd.toLocaleString()} USD (₹${hedgedMitigationInrCr} Cr) in total cost optimization.`
-    : `Base Plan evaluated at baseline parameters ($${baseDeliveredCost.totalLanded}/MT). Adjust the shock sliders on the left to evaluate sensitivity against severe freight spikes, demurrage accumulation, and bunker escalation.`;
+    ? `Under active sensitivity stress, delivered cost shifts from $${baseDeliveredCost.totalLanded}/MT to $${stressedEconomics.newLanded}/MT (${costDeltaPerMt >= 0 ? `+$${costDeltaPerMt}` : `-$${Math.abs(costDeltaPerMt)}`}/MT). Without NaviBulk, unhedged spot exposure increases budget by $${Math.abs(grossShockDeltaUsd).toLocaleString()} USD. NaviBulk's adaptive recommendation (${stressedEconomics.stressedRecommendation}) caps exposure, protecting +$${hedgedMitigationSavingsUsd.toLocaleString()} USD (₹${hedgedMitigationInrCr} Cr / -$${hedgedMitigationPerMt}/MT) in total cost optimization.`
+    : `Base Plan evaluated at baseline parameters ($${baseDeliveredCost.totalLanded}/MT). Adjust the shock sliders or select a historical crisis preset to evaluate sensitivity against severe freight spikes, demurrage accumulation, and bunker escalation.`;
 
   return (
     <StageShell
       stageId="stress"
       conclusion={conclusionText}
-      nextActionLabel="Review Counterfactual Proof →"
+      nextActionLabel="Review Counterfactual Proof"
       onNextAction={() => advanceStage('stress')}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         
         {/* ── 1. TOTAL COST OPTIMIZATION & HEDGING DIFFERENCE BANNER ── */}
         {isStressed && grossShockDeltaUsd > 0 && (
-          <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '8px', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+          <div 
+            className="analytical-card"
+            style={{ 
+              background: '#F0FDF4', 
+              border: '1px solid #BBF7D0', 
+              borderRadius: '12px', 
+              padding: '1.25rem 1.5rem', 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              flexWrap: 'wrap', 
+              gap: '1rem', 
+              boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)' 
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#DCFCE7', border: '1px solid #86EFAC', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16A34A' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--success-soft)', border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
                 <ShieldCheck size={20} />
               </div>
               <div>
-                <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#166534', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <span className="section-eyebrow" style={{ fontSize: '0.68rem', color: '#166534' }}>
                   Total Cost Optimization Under Market Stress
                 </span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#14532D', margin: '0.15rem 0 0.1rem' }}>
                   NaviBulk Hedges Protect +${hedgedMitigationSavingsUsd.toLocaleString()} USD in Capital
                 </h3>
                 <div style={{ fontSize: '0.76rem', color: '#166534' }}>
-                  Adaptive contract structuring mitigates 65% of the unhedged spot shock (+${hedgedMitigationPerMt}/MT protected • ₹{hedgedMitigationInrCr} Cr)
+                  Adaptive contract structuring and Virtual Arrival mitigate unhedged spot shocks (+${hedgedMitigationPerMt}/MT protected • ₹{hedgedMitigationInrCr} Cr)
                 </div>
               </div>
             </div>
 
-            <div style={{ background: '#16A34A', color: '#FFFFFF', padding: '0.5rem 1rem', borderRadius: '6px', textAlign: 'right' }}>
+            <div style={{ background: 'var(--success)', color: '#FFFFFF', padding: '0.55rem 1.1rem', borderRadius: '10px', textAlign: 'right' }}>
               <span style={{ fontSize: '0.64rem', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>Protected Capital</span>
               <span style={{ fontSize: '1.35rem', fontWeight: 900, fontFamily: 'var(--font-mono)' }}>
                 +${hedgedMitigationSavingsUsd.toLocaleString()} USD
@@ -91,33 +102,75 @@ export default function StressStage() {
           </div>
         )}
 
+        {/* ── HISTORICAL CRISIS PRESETS ── */}
+        <div className="analytical-card" style={{ borderRadius: '12px', padding: '1rem 1.25rem', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity size={16} color="var(--accent-blue)" />
+              <span style={{ fontSize: '0.76rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                Historical Market Shock Presets
+              </span>
+            </div>
+            <span className="provenance-label">EMPIRICAL CRISIS STRESSORS</span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.65rem' }}>
+            {STRESS_PRESETS.map((preset) => {
+              const isActive = stressState.presetId === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => applyStressPreset(preset.id)}
+                  style={{
+                    background: isActive ? '#EFF6FF' : '#F8FAFC',
+                    border: isActive ? '2px solid var(--accent-blue)' : '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '0.65rem 0.85rem',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: isActive ? 'var(--accent-blue-dark)' : 'var(--text-primary)' }}>
+                      {preset.label}
+                    </span>
+                    <span className="pill-badge" style={{ fontSize: '0.62rem', background: isActive ? 'var(--accent-blue)' : '#E2E8F0', color: isActive ? '#FFF' : '#475569' }}>
+                      {preset.tag}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.25rem', lineHeight: 1.35 }}>
+                    {preset.description}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* ── 2. MAIN 2-COLUMN LAYOUT: SLIDERS + IMPACT ANALYSIS ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
           
           {/* ── LEFT COLUMN: STRESS ASSUMPTION SLIDERS ── */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
+          <div className="analytical-card" style={{ borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Sliders size={16} color="#2563EB" />
-                <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Stress Shock Assumptions
+                <Sliders size={16} color="var(--accent-blue)" />
+                <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Manual Sensitivity Controls
                 </h2>
               </div>
               {isStressed && (
                 <button
                   onClick={resetStressState}
+                  className="btn-secondary"
                   style={{
-                    background: 'transparent',
-                    border: '1px solid #CBD5E1',
-                    borderRadius: '4px',
-                    padding: '0.25rem 0.6rem',
+                    padding: '0.3rem 0.75rem',
                     fontSize: '0.72rem',
-                    color: '#475569',
-                    cursor: 'pointer',
+                    borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.3rem',
-                    fontWeight: 600
+                    gap: '0.35rem'
                   }}
                 >
                   <RotateCcw size={12} />
@@ -139,16 +192,16 @@ export default function StressStage() {
                 <input
                   type="range"
                   min="-30"
-                  max="50"
+                  max="85"
                   step="5"
                   value={stressState.freightPct}
                   onChange={(e) => updateStressState({ freightPct: Number(e.target.value) })}
                   style={{ width: '100%', accentColor: '#2563EB' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#94A3B8' }}>
-                  <span>-30% (Market Collapse)</span>
+                  <span>-30% (Market Slump)</span>
                   <span>0% (Baseline)</span>
-                  <span>+50% (Sharp Spike)</span>
+                  <span>+85% (Supercycle)</span>
                 </div>
               </div>
 
@@ -157,7 +210,7 @@ export default function StressStage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', fontSize: '0.75rem' }}>
                   <span style={{ fontWeight: 700, color: '#334155' }}>Destination Port Congestion</span>
                   <span style={{ fontWeight: 800, fontFamily: 'var(--font-mono)', color: stressState.congestionDays > 0 ? '#B45309' : '#64748B' }}>
-                    +{stressState.congestionDays} Days Laytime Delay
+                    +{stressState.congestionDays} Days Delay
                   </span>
                 </div>
                 <input
@@ -171,7 +224,7 @@ export default function StressStage() {
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#94A3B8' }}>
                   <span>0 Days (Normal)</span>
-                  <span>+7 Days (Swell / Cyclone)</span>
+                  <span>+6 Days (Cyclone Gale)</span>
                   <span>+14 Days (Berth Breakdown)</span>
                 </div>
               </div>
@@ -187,16 +240,16 @@ export default function StressStage() {
                 <input
                   type="range"
                   min="-20"
-                  max="40"
+                  max="50"
                   step="5"
                   value={stressState.bunkerPct}
                   onChange={(e) => updateStressState({ bunkerPct: Number(e.target.value) })}
                   style={{ width: '100%', accentColor: '#2563EB' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#94A3B8' }}>
-                  <span>-20% (Crude Softening)</span>
-                  <span>0% (Baseline)</span>
-                  <span>+40% (Geopolitical Shock)</span>
+                  <span>-20% ($663/MT)</span>
+                  <span>0% ($829.50/MT)</span>
+                  <span>+50% ($1,244/MT)</span>
                 </div>
               </div>
 
@@ -227,7 +280,7 @@ export default function StressStage() {
             </div>
 
             <div style={{ marginTop: '1.25rem', padding: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', fontSize: '0.72rem', color: '#64748B' }}>
-              <strong>Deterministic Sensitivity Engine:</strong> Calculations update synchronously. Port congestion accumulates Worldscale laytime demurrage ($0.35/MT/day). Freight and bunker apply proportional deltas.
+              <strong>Audited Stress Engine:</strong> Calculations update synchronously. Port congestion accumulates real vessel day-hire demurrage (${Math.round(baseDeliveredCost.demurragePortion * inputs.tonnage / (baseDeliveredCost.portWaitDays || 2.2)).toLocaleString()}/day). Period COA contracts absorb spot swings proportionally.
             </div>
           </div>
 
@@ -278,10 +331,10 @@ export default function StressStage() {
                   ${hedgedLandedCost} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>/ MT</span>
                 </div>
                 <div style={{ fontSize: '0.72rem', fontWeight: 700, color: isStressed ? '#166534' : '#64748B', marginTop: '0.2rem' }}>
-                  {isStressed ? `Protects +$${hedgedMitigationSavingsUsd.toLocaleString()} USD` : 'Hedges ready'}
+                  {isStressed ? `Protects +$${hedgedMitigationSavingsUsd.toLocaleString()} USD` : 'Hedges active'}
                 </div>
                 <div style={{ fontSize: '0.68rem', color: isStressed ? '#15803D' : '#64748B', marginTop: '0.2rem' }}>
-                  Hedged Total: ${hedgedTotalOutlayUsd.toLocaleString()} USD
+                  Hedged Total: ${hedgedTotalOutlayUsd?.toLocaleString()} USD
                 </div>
               </div>
 
@@ -301,14 +354,14 @@ export default function StressStage() {
 
               <div style={{ marginBottom: '1rem' }}>
                 <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase' }}>
-                  WHY IT CHANGED (ROOT CAUSES)
+                  WHY IT CHANGED (MATHEMATICAL DRIVERS)
                 </span>
                 <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#334155', lineHeight: 1.45 }}>
                   {stressState.congestionDays > 0 && `Port delay (+${stressState.congestionDays}d) adds +$${stressedEconomics.demurrageDelta}/MT in laytime demurrage ($${Math.round(stressedEconomics.demurrageDelta * (stressedEconomics.stressedTonnage || inputs.tonnage)).toLocaleString()} USD). `}
                   {stressState.freightPct !== 0 && `Freight index shift (${stressState.freightPct > 0 ? '+' : ''}${stressState.freightPct}%) imparts $${stressedEconomics.freightDelta}/MT variance ($${Math.round(stressedEconomics.freightDelta * (stressedEconomics.stressedTonnage || inputs.tonnage)).toLocaleString()} USD). `}
                   {stressState.bunkerPct !== 0 && `Bunker price shift (${stressState.bunkerPct > 0 ? '+' : ''}${stressState.bunkerPct}%) imparts $${stressedEconomics.bunkerDelta}/MT fuel variance. `}
                   {stressState.parcelSwingMt !== 0 && `Parcel swing of ${stressState.parcelSwingMt > 0 ? '+' : ''}${stressState.parcelSwingMt.toLocaleString()} MT shifts total budget exposure by $${Math.round(stressedEconomics.stressedTotalOutlayUsd - baseDeliveredCost.totalOutlayUsd).toLocaleString()} USD. `}
-                  {!isStressed && 'All parameters are at baseline. Adjust sliders on the left to evaluate sensitivity.'}
+                  {!isStressed && 'All parameters are at baseline. Adjust sliders on the left or click a historical preset above to evaluate sensitivity.'}
                 </p>
               </div>
 

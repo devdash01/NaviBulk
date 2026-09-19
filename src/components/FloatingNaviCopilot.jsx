@@ -1,4 +1,4 @@
-// SAIL NaviBulk — Next-Gen Persistent Global Floating AI Maritime Decision Copilot (SIH 26006)
+// SAIL NaviBulk — Next-Gen Persistent Global Floating AI Maritime Decision Copilot
 // Featuring Institutional Dark UI, Rich Typography, Interactive KPI Cards, Visual Progress Gauges & Multi-Turn Chat
 import React, { useState, useEffect, useRef } from 'react';
 import { 
@@ -272,7 +272,7 @@ export default function FloatingNaviCopilot({
       id: 'welcome-1',
       sender: 'ai',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      text: `👋 **Welcome to SAIL NaviCopilot AI!**\n\nI am your 24/7 Maritime Intelligence & Chartering Decision Assistant for **SIH Problem Statement #26006**.\n\nI have complete contextual visibility of your active voyage parameters, Baltic sub-indices, Indian port bathymetric depths, IMO hydrodynamic models, and BIMCO legal clauses.`,
+      text: `👋 **Welcome to SAIL NaviCopilot AI!**\n\nI am your 24/7 Maritime Intelligence & Chartering Decision Assistant for **Steel Authority of India Limited (SAIL)**.\n\nI have complete contextual visibility of your active voyage parameters, Baltic sub-indices, Indian port bathymetric depths, IMO hydrodynamic models, and BIMCO legal clauses.`,
       confidence: '100% Context Grounded',
       modelUsed: 'SAIL NaviBulk Neural Core',
       visualCards: [
@@ -305,7 +305,7 @@ export default function FloatingNaviCopilot({
 
   // Preset suggested queries
   const SUGGESTED_QUESTIONS = [
-    { label: 'Explain Problem Statement 26006', query: 'Explain Problem Statement 26006 and how NaviBulk solves it.' },
+    { label: 'Explain NaviBulk Architecture', query: 'Explain the commercial decision architecture and how NaviBulk solves it.' },
     { label: 'Why Panamax vs Capesize?', query: 'Why did the AI recommend Panamax instead of Capesize for Paradip?' },
     { label: 'How does ML Ensemble work?', query: 'Explain the SARIMA + XGBoost + GARCH machine learning ensemble.' },
     { label: 'Explain 13.0 kts Fuel Math', query: 'How does the IMO Admiralty Cubic Law calculate 13.0 kts fuel savings?' },

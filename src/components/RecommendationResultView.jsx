@@ -271,7 +271,7 @@ export default function RecommendationResultView({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <div style={{ textAlign: 'right', marginRight: '0.5rem' }}>
             <span style={{ fontSize: '0.62rem', color: 'var(--text-low)', textTransform: 'uppercase', fontWeight: 800, display: 'block' }}>Fixture Requisition ID</span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-hi)', fontWeight: 700 }}>SAIL-NB-26006</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-hi)', fontWeight: 700 }}>SAIL-NB-REQ-01</span>
           </div>
 
           <button

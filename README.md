@@ -40,9 +40,13 @@
 - **Audited Indian Port & Berth Constraints Matrix:** Rigorously cross-referenced draft, LOA, beam, and DWT limits across Indian discharge berths with real-time Waterline Cross-Section hydrodynamic simulations.
 - **Multi-Horizon Freight Machine Learning:** Trained on **10,246 genuine Baltic Exchange trading days (1985–2026)**, utilizing stationary log-return XGBoost (1.81% 1-day MAPE) and SARIMA(1,0,1) for multi-week chartering windows.
 - **Full-Spectrum Voyage Economics:** Exact Time Charter Equivalent (TCE), bunker burn modeling (VLSFO + LSMGO at eco/normal/fast steaming speeds), canal toll schedules, and Haldia transshipment/lightering fees.
-- **Counterfactual Historical Replay Backtester:** Allows chartering managers to backtest their decision strategy against real market outcomes over the last 365 trading days.
-- **Stress-Testing Engine:** Simulates weather route deviations, geopolitical choke-point disruptions (Suez/Malacca/Panama), port demurrage shocks, and bunkering cost surges.
-- **Executive Fixture Dossier & Approval Lock:** Generates comprehensive board-ready charter party terms, saving ledgers, and governance sign-off requisitions.
+- **Triangular Backhaul Repositioning Studio:** Monetizes unladen ballast legs by pairing return voyages with coastal steel and iron ore shipments, recovering up to $350k/voyage in disbursements.
+- **Maritime Corridor & Choke-Point Risk Studio:** Evaluates geopolitical disruptions, canal bottlenecks (Suez/Panama), and strait security (Malacca/Bab-el-Mandeb) with live war risk insurance modeling.
+- **Vessel Class Decision Studio:** Interactive multi-class comparison (Capesize vs Panamax vs Supramax) balancing parcel size economics against draft limits and lightering fees.
+- **Dynamic Speed & Eco-Steaming Hydrodynamic Optimizer:** Real-time cubic fuel burn curves ($P \propto v^3$) determining optimal steaming speeds to minimize combined charter hire and bunker expenditure.
+- **Cross-Basin Alternative Sourcing Arbitrage (Stage 07):** Challenges baseline Source 1 nominations (Australia) against Mozambique, Indonesia, and US basins for minimum delivered $/MT cost at the blast furnace gate.
+- **Counterfactual Historical Replay Backtester:** Allows chartering managers to backtest their decision strategy against real market outcomes over the last 365 trading days with zero lookahead bias.
+- **Executive Fixture Dossier & Approval Lock:** Generates comprehensive board-ready charter party terms, savings ledgers, and governance sign-off requisitions.
 
 ---
 
@@ -107,7 +111,7 @@ graph LR
 
 | Stage | Name | Analytical Scope | Key Outputs |
 |---|---|---|---|
-| **01** | **Requirement** | Cargo volume, grade, load port, discharge terminal, and target laycan window. | Base nomination object & tolerance bounds |
+| **01** | **Requirement** | Cargo volume, grade, load port (Source 1), discharge terminal, and target laycan. | Base nomination object & tolerance bounds |
 | **02** | **Feasibility** | Draft, LOA, beam, air draft, and DWT limits at load & discharge berths. | Clearance verification & tidal draft window |
 | **03** | **Base Plan** | AIS vessel selection, nautical routing, speed selection, and sea-margin days. | ETA to laycan delta & nautical distance |
 | **04** | **Market Timing** | BDI / BCI / BPI trajectory, momentum regime, and charter lock timing recommendations. | "Charter Now" vs "Float / Wait" rating |
@@ -180,7 +184,7 @@ sih/
 │   └── tests/                      # Python pytest regression suite
 ├── src/                            # React 19 Frontend Web Application
 │   ├── stages/                     # 10 Single-Stage Focused Decision Views
-│   │   ├── RequirementStage.jsx    # Stage 01: Cargo & laycan nomination
+│   │   ├── RequirementStage.jsx    # Stage 01: Cargo & laycan nomination (Source 1)
 │   │   ├── FeasibilityStage.jsx    # Stage 02: Physical berth constraints
 │   │   ├── BasePlanStage.jsx       # Stage 03: Fleet allocation & voyage route
 │   │   ├── MarketStage.jsx         # Stage 04: Freight timing & BDI intelligence
@@ -190,22 +194,30 @@ sih/
 │   │   ├── StressStage.jsx         # Stage 08: Scenario & sensitivity stress tests
 │   │   ├── CounterfactualStage.jsx # Stage 09: 365-day historical replay backtest
 │   │   └── DecisionStage.jsx       # Stage 10: Executive fixture dossier & lock
-│   ├── components/                 # Reusable UI & Maritime Visualizations
+│   ├── components/                 # Specialized Studios & Maritime Visualizations
+│   │   ├── BackhaulRepositioningStudio.jsx # Triangular ballast monetization studio
+│   │   ├── CorridorRiskVisualStudio.jsx    # Choke-point & strait security visualizer
+│   │   ├── VesselClassDecisionStudio.jsx   # Multi-class Cape/Panamax/Supra optimizer
 │   │   ├── BerthWaterlineCrossSection.jsx  # SVG hydrodynamic draft simulator
 │   │   ├── InteractiveFleetMap.jsx         # Leaflet/Canvas maritime routing map
 │   │   ├── ExecutiveSavingsLedger.jsx      # Live cost & savings accounting
 │   │   ├── CharterLockModal.jsx            # Board requisition modal
-│   │   └── StageRouter.jsx                 # Dynamic workflow navigation
+│   │   ├── HomePage.jsx                    # Enterprise mission control & overview
+│   │   ├── StageRouter.jsx                 # Dynamic 10-stage workflow navigation
+│   │   ├── StageShell.jsx                  # Standardized stage header & conclusion
+│   │   └── TopBar.jsx / Sidebar.jsx        # Institutional navigation chrome
 │   ├── context/
 │   │   └── DecisionContext.jsx     # Centralized shared state & computation engine
 │   ├── data/
 │   │   ├── mockFleet.js            # Live AIS vessel specifications & positions
 │   │   ├── portConstraints.js      # Audited port parameters & berth matrix
-│   │   └── maritimeDistances.js    # Nautical mile matrix across global routes
+│   │   └── freightData.js          # Baltic index history & distance matrix
 │   └── engine/                     # Browser-side analytical engines
 │       ├── forecastingEngine.js    # Client-side cached model inferences
 │       ├── recommendationEngine.js # Vessel ranking & score weighting
-│       └── tceEngine.js            # Real-time TCE calculation
+│       ├── tceEngine.js            # Real-time TCE & bunker calculations
+│       └── riskEngine.js           # Value-at-Risk & delay exposure model
+├── public/                         # Production assets, icons, and hero photography
 ├── website_photos/                 # High-resolution platform screenshots
 ├── DATA_METHODOLOGY.md             # In-depth mathematical & empirical documentation
 ├── MODEL_JUSTIFICATION.md          # Econometric & machine learning design rationale

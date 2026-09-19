@@ -43,6 +43,7 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.vs/
 .DS_Store
 Thumbs.db
 *.suo
@@ -50,3 +51,4 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+

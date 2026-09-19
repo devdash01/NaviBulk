@@ -30,13 +30,16 @@ import {
   LineChart,
   BarChart3,
   SearchCheck,
-  Check
+  Check,
+  Menu,
+  ArrowUpRight
 } from 'lucide-react';
 import { BUNKER_PRICE_VLSFO, COMMODITY_PINK_SHEET, HISTORICAL_SERIES } from '../data/freightData';
 import { EAST_COAST_PORTS, FOREIGN_LOAD_PORTS } from '../data/portConstraints';
 import RouteLine from './RouteLine';
 
 export default function HomePage({ onNavigate, onConfigureVoyage }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [plantSelectorOpen, setPlantSelectorOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState({ name: 'SAIL Corporate HQ', location: 'Lodhi Road, New Delhi' });
@@ -254,427 +257,770 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
       }}
     >
       
-      {/* ── CRISP WHITE MARITIME NAVBAR ── */}
+      {/* ── TOP FLOATING PILL NAVBAR (Matching Behance Transocean Header) ── */}
       <header 
         style={{
-          position: 'sticky',
+          position: 'absolute',
           top: 0,
-          zIndex: 100,
+          left: 0,
           width: '100%',
-          padding: '0.85rem 3rem',
+          zIndex: 60,
+          padding: '1.75rem 3.5rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #E2E8F0',
-          background: 'rgba(255, 255, 255, 0.98)',
-          backdropFilter: 'blur(16px)',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
+          pointerEvents: 'auto'
         }}
       >
-        {/* Brand Identity */}
-        <div 
-          onClick={() => onNavigate('home')}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.85rem',
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-        >
-          <img 
-            src="/navibulk-logo.png" 
-            alt="SAIL NaviBulk Logo" 
+        {/* LEFT: Blue Rounded Menu Button + Grouped White Pill Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation menu"
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              background: '#FFFFFF',
-              padding: '2px',
-              border: '1px solid #E2E8F0',
-              objectFit: 'contain',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              background: '#2563EB',
+              border: 'none',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)',
+              transition: 'all 0.2s ease',
               flexShrink: 0
             }}
-          />
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <Menu size={19} strokeWidth={2.5} />
+          </button>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ 
-                fontSize: '1.05rem', 
-                fontWeight: 800, 
-                letterSpacing: '0.02em', 
-                color: '#0F172A',
-                lineHeight: 1
-              }}>
-                SAIL NAVIBULK
-              </span>
-              <span style={{
-                fontSize: '0.62rem',
+          {/* Grouped Pill Container (White) */}
+          <div 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: '#FFFFFF',
+              borderRadius: '9999px',
+              padding: '0.28rem 0.35rem',
+              boxShadow: '0 4px 18px rgba(0, 0, 0, 0.15)',
+              gap: '0.15rem'
+            }}
+          >
+            <button 
+              onClick={() => setTrackingModalOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '0.45rem 1.15rem',
+                borderRadius: '9999px',
+                fontSize: '0.84rem',
                 fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                background: '#FEF3C7',
-                color: '#92400E',
-                padding: '0.15rem 0.45rem',
-                borderRadius: '4px',
-                border: '1px solid rgba(180, 83, 9, 0.2)'
-              }}>
-                ENTERPRISE
-              </span>
-            </div>
-            <span style={{ 
-              fontSize: '0.68rem', 
-              fontWeight: 500, 
-              color: '#64748B', 
-              letterSpacing: '0.01em',
-              marginTop: '3px'
-            }}>
-              Steel Authority of India Limited • Central Raw Materials Directorate
-            </span>
+                color: '#1E293B',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              Tracking
+            </button>
+
+            <button 
+              onClick={() => {
+                onNavigate('market');
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '0.45rem 1.15rem',
+                borderRadius: '9999px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#1E293B',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              Prices
+            </button>
+
+            <button 
+              onClick={() => onNavigate('ports')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '0.45rem 1.15rem',
+                borderRadius: '9999px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#1E293B',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              Port Matrix
+            </button>
           </div>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <button 
-            onClick={() => onNavigate('home')}
+        {/* CENTER: Minimalist Glowing Emblem Logo */}
+        <div 
+          onClick={() => onNavigate('home')}
+          style={{
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '46px',
+            height: '32px',
+            borderRadius: '9999px',
+            border: '1.5px solid rgba(255, 255, 255, 0.45)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 0 16px rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FFFFFF'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.45)'}
+          title="SAIL NaviBulk Home"
+        >
+          <div 
             style={{
-              background: '#F1F5F9',
-              border: '1px solid #CBD5E1',
-              color: '#0F172A',
-              fontSize: '0.84rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              padding: '0.45rem 0.95rem',
-              borderRadius: '6px',
-              transition: 'all 0.15s'
+              width: '16px',
+              height: '9px',
+              borderRadius: '9999px',
+              border: '2px solid #FFFFFF'
             }}
-          >
-            Overview
-          </button>
+          />
+        </div>
 
-          {/* Workstations Dropdown */}
-          <div style={{ position: 'relative' }}>
-            <button 
-              onClick={() => setSolutionsOpen(!solutionsOpen)}
-              style={{
-                background: solutionsOpen ? '#F1F5F9' : 'transparent',
-                border: '1px solid transparent',
-                color: '#334155',
-                fontSize: '0.84rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.45rem 0.95rem',
-                borderRadius: '6px',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                if (!solutionsOpen) e.currentTarget.style.color = '#0F172A';
-              }}
-              onMouseLeave={(e) => {
-                if (!solutionsOpen) e.currentTarget.style.color = '#334155';
-              }}
-            >
-              <span>Workstations</span>
-              <ChevronDown size={13} style={{ transform: solutionsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.7 }} />
-            </button>
-
-            {solutionsOpen && (
-              <div 
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 0.5rem)',
-                  left: 0,
-                  width: '350px',
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '10px',
-                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
-                  padding: '0.65rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.25rem',
-                  zIndex: 110,
-                }}
-              >
-                <div 
-                  onClick={() => { setSolutionsOpen(false); onNavigate('planner'); }}
-                  style={{ padding: '0.75rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', gap: '0.75rem', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <Compass size={18} color="#2563EB" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Voyage Planner</div>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Landed $/MT ranking across Capesize vs Panamax</div>
-                  </div>
-                </div>
-
-                <div 
-                  onClick={() => { setSolutionsOpen(false); onNavigate('ports'); }}
-                  style={{ padding: '0.75rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', gap: '0.75rem', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <Anchor size={18} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Port Infrastructure & Berths</div>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>7 Indian East Coast ports bathymetric draft matrix</div>
-                  </div>
-                </div>
-
-                <div 
-                  onClick={() => { setSolutionsOpen(false); onNavigate('market'); }}
-                  style={{ padding: '0.75rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', gap: '0.75rem', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <TrendingUp size={18} color="#D97706" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Market Intelligence Terminal</div>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Verified 1-Day (1.81%) & 14-Day (19.19%) econometric forecasts</div>
-                  </div>
-                </div>
-
-                <div 
-                  onClick={() => { setSolutionsOpen(false); onNavigate('backhaul'); }}
-                  style={{ padding: '0.75rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', gap: '0.75rem', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <RefreshCw size={18} color="#7C3AED" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Backhaul Monetizer</div>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Empty ballast return cargo matching engine</div>
-                  </div>
-                </div>
-
-                <div 
-                  onClick={() => { setSolutionsOpen(false); onNavigate('ledger'); }}
-                  style={{ padding: '0.75rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', gap: '0.75rem', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <FileText size={18} color="#059669" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Executive Savings Ledger</div>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Itemized commercial audit dossier</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button 
-            onClick={() => onNavigate('ports')}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#334155', 
-              fontSize: '0.84rem', 
-              fontWeight: 600, 
-              cursor: 'pointer', 
-              padding: '0.45rem 0.95rem',
-              borderRadius: '6px',
-              transition: 'all 0.15s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#0F172A'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#334155'}
-          >
-            Port Matrix
-          </button>
-
-          <button 
-            onClick={() => onNavigate('market')}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#334155', 
-              fontSize: '0.84rem', 
-              fontWeight: 600, 
-              cursor: 'pointer', 
-              padding: '0.45rem 0.95rem',
-              borderRadius: '6px',
-              transition: 'all 0.15s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#0F172A'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#334155'}
-          >
-            Baltic Models
-          </button>
-
-          <button 
-            onClick={() => setTrackingModalOpen(true)}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#334155', 
-              fontSize: '0.84rem', 
-              fontWeight: 600, 
-              cursor: 'pointer', 
-              padding: '0.45rem 0.95rem',
-              borderRadius: '6px',
-              transition: 'all 0.15s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#0F172A'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#334155'}
-          >
-            Track Consignment
-          </button>
-        </nav>
-
-        {/* Right Header Actions */}
+        {/* RIGHT: Schedule Transport Button + Flag + Avatar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          {/* Steel Plant Selector */}
-          <div style={{ position: 'relative' }}>
-            <button 
-              onClick={() => setPlantSelectorOpen(!plantSelectorOpen)}
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                borderRadius: '6px',
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.8rem',
-                color: '#0F172A',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                transition: 'border-color 160ms ease',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#B45309'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#CBD5E1'}
-            >
-              <Building2 size={13} color="#B45309" />
-              <span>{selectedPlant.name}</span>
-              <ChevronDown size={12} style={{ transform: plantSelectorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.7 }} />
-            </button>
-
-            {plantSelectorOpen && (
-              <div 
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 0.4rem)',
-                  right: 0,
-                  width: '275px',
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '8px',
-                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
-                  padding: '0.4rem',
-                  zIndex: 110,
-                }}
-              >
-                <div style={{ padding: '0.4rem 0.6rem', fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', borderBottom: '1px solid #E2E8F0', marginBottom: '0.25rem' }}>
-                  Target Steel Plant Directorate
-                </div>
-                {sailPlants.map((p) => (
-                  <div 
-                    key={p.name}
-                    onClick={() => {
-                      setSelectedPlant(p);
-                      setPlantSelectorOpen(false);
-                    }}
-                    style={{
-                      padding: '0.55rem 0.65rem',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      color: selectedPlant.name === p.name ? '#92400E' : '#334155',
-                      background: selectedPlant.name === p.name ? '#FEF3C7' : 'transparent',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedPlant.name !== p.name) e.currentTarget.style.background = '#F8FAFC';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedPlant.name !== p.name) e.currentTarget.style.background = 'transparent';
-                    }}
-                  >
-                    <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{p.name}</div>
-                    <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '1px' }}>{p.desc}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Primary Launch Desk CTA */}
-          <button 
+          <button
             onClick={() => handleLaunchPlanner()}
             style={{
-              background: '#0F172A',
+              background: '#2563EB',
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: '6px',
-              padding: '0.5rem 1.15rem',
-              fontSize: '0.84rem',
+              borderRadius: '9999px',
+              padding: '0.62rem 1.45rem',
+              fontSize: '0.86rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.45rem',
-              boxShadow: '0 2px 4px rgba(15, 23, 42, 0.2)',
+              gap: '0.5rem',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.45)',
               transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#1E293B'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#0F172A'}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#1D4ED8';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#2563EB';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
-            <span>Launch Decision Desk</span>
-            <ArrowRight size={14} />
+            Schedule Transport
           </button>
+
+          {/* Country Flag Badge (Indian Flag 🇮🇳) */}
+          <div 
+            title="India • Ministry of Steel / SAIL"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '2px solid #FFFFFF',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              cursor: 'pointer',
+              flexShrink: 0
+            }}
+          >
+            <div style={{ flex: 1, background: '#FF9933' }} />
+            <div style={{ flex: 1, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', border: '1px solid #000080' }} />
+            </div>
+            <div style={{ flex: 1, background: '#128807' }} />
+          </div>
+
+          {/* User Avatar */}
+          <div 
+            onClick={() => setPlantSelectorOpen(!plantSelectorOpen)}
+            title="Executive Logistics Desk • Steel Authority of India"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '2px solid #FFFFFF',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+              cursor: 'pointer',
+              flexShrink: 0
+            }}
+          >
+            <img 
+              src="/navibulk_user_avatar.jpg" 
+              alt="Executive Avatar" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
         </div>
       </header>
 
+      {/* ── EXECUTIVE SLIDE-OUT / QUICK DRAWER (WHEN MENU BUTTON CLICKED) ── */}
+      {menuOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 150,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            padding: '1.75rem 3.5rem'
+          }}
+          onClick={() => setMenuOpen(false)}
+        >
+          <div 
+            style={{
+              width: '380px',
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
+              padding: '1.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              border: '1px solid #E2E8F0'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <img src="/navibulk-logo.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>SAIL NaviBulk Workstation</span>
+              </div>
+              <button onClick={() => setMenuOpen(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748B' }}>
+                <X size={18} />
+              </button>
+            </div>
 
-      {/* ── CINEMATIC FULL-BLEED PHOTOGRAPHIC HERO (sail_bulk_hero.jpg Restored + High Contrast Visibility) ── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div 
+                onClick={() => { setMenuOpen(false); onNavigate('planner'); }}
+                style={{ padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}
+              >
+                <Ship size={18} color="#2563EB" />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A' }}>10-Stage Decision Pipeline</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Linear commercial chartering optimization</div>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => { setMenuOpen(false); onNavigate('ports'); }}
+                style={{ padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}
+              >
+                <Anchor size={18} color="#0D9488" />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A' }}>Port Operations Matrix</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Audited draft limits, LOA & beam checks</div>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => { setMenuOpen(false); onNavigate('market'); }}
+                style={{ padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}
+              >
+                <TrendingUp size={18} color="#B45309" />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A' }}>Baltic Freight Econometrics</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B' }}>SARIMA & XGBoost stationary log-returns</div>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => { setMenuOpen(false); setTrackingModalOpen(true); }}
+                style={{ padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}
+              >
+                <Navigation size={18} color="#7C3AED" />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A' }}>AIS Consignment Tracker</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Live vessel telemetry & milestone status</div>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => { setMenuOpen(false); onNavigate('ledger'); }}
+                style={{ padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}
+              >
+                <FileText size={18} color="#16A34A" />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A' }}>Executive Savings Ledger</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Audited cost avoidance itemization</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── STEEL PLANT SELECTOR DROPDOWN (WHEN AVATAR CLICKED) ── */}
+      {plantSelectorOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 140,
+            background: 'transparent'
+          }}
+          onClick={() => setPlantSelectorOpen(false)}
+        >
+          <div 
+            style={{
+              position: 'absolute',
+              top: '5.2rem',
+              right: '3.5rem',
+              width: '290px',
+              background: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              borderRadius: '10px',
+              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.2)',
+              padding: '0.5rem',
+              zIndex: 145
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: '0.45rem 0.65rem', fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', borderBottom: '1px solid #E2E8F0', marginBottom: '0.25rem' }}>
+              SAIL Steel Plant Directorate
+            </div>
+            {sailPlants.map((p) => (
+              <div 
+                key={p.name}
+                onClick={() => {
+                  setSelectedPlant(p);
+                  setPlantSelectorOpen(false);
+                }}
+                style={{
+                  padding: '0.55rem 0.65rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  color: selectedPlant.name === p.name ? '#92400E' : '#334155',
+                  background: selectedPlant.name === p.name ? '#FEF3C7' : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedPlant.name !== p.name) e.currentTarget.style.background = '#F8FAFC';
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedPlant.name !== p.name) e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{p.name}</div>
+                <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '1px' }}>{p.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
+      {/* ── CINEMATIC FULL-SCREEN HERO (MATCHING BEHANCE TRANSOCEAN) ── */}
       <section 
         style={{
           position: 'relative',
           width: '100%',
-          minHeight: '85vh',
+          height: '100vh',
+          minHeight: '720px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           overflow: 'hidden',
-          background: '#0F172A',
-          borderBottom: '1px solid #E2E8F0',
-          padding: '2.75rem 3.5rem 2.5rem'
+          background: '#0B1528'
         }}
       >
-        {/* CSS Ken Burns Background Layer — Authentic dry bulk carrier image */}
-        <div 
-          className="ken-burns-hero"
-          style={{
-            position: 'absolute',
-            inset: '-4%',
-            width: '108%',
-            height: '108%',
-            backgroundImage: `url('/sail_bulk_hero.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 50%',
-            filter: 'brightness(0.46) contrast(1.18) saturate(0.88)',
-            zIndex: 0,
-            pointerEvents: 'none'
-          }}
-        />
-
-        {/* High-Contrast Gradient Scrim: Guarantees 100% text legibility */}
+        {/* Photorealistic Sunset Bulk Ship Photography */}
         <div 
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.65) 50%, rgba(15, 23, 42, 0.94) 100%)',
+            backgroundImage: `url('/navibulk_hero_sunset.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 42%',
+            zIndex: 0
+          }}
+        />
+
+        {/* Subtle darkening gradient overlay for pristine contrast */}
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(8, 16, 32, 0.40) 0%, rgba(8, 16, 32, 0.15) 45%, rgba(8, 16, 32, 0.70) 100%)',
             zIndex: 1,
             pointerEvents: 'none'
           }}
         />
 
-        <div style={{ maxWidth: '1400px', width: '100%', margin: '0 auto', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {/* Top spacer to account for floating header */}
+        <div style={{ height: '110px', position: 'relative', zIndex: 2 }} />
+
+        {/* CENTER HERO CANVAS: MASSIVE TYPOGRAPHY & TAGLINE */}
+        <div 
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            maxWidth: '1440px',
+            width: '100%',
+            margin: '0 auto',
+            padding: '0 3.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            flex: 1
+          }}
+        >
+          {/* Main Title & Tagline Flex Row */}
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '2rem'
+            }}
+          >
+            {/* Massive NaviBulk Heading (Behance Transocean Style) */}
+            <h1 
+              style={{
+                fontSize: 'clamp(5.2rem, 12.5vw, 11.2rem)',
+                fontWeight: 800,
+                color: '#FFFFFF',
+                letterSpacing: '-0.04em',
+                lineHeight: 0.90,
+                margin: 0,
+                textShadow: '0 4px 28px rgba(0, 0, 0, 0.45)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif"
+              }}
+            >
+              NaviBulk
+            </h1>
+
+            {/* Right Tagline */}
+            <div 
+              style={{
+                maxWidth: '380px',
+                marginTop: '1.4rem',
+                textAlign: 'left'
+              }}
+            >
+              <div 
+                style={{
+                  fontSize: 'clamp(1.5rem, 2.6vw, 2.35rem)',
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.02em',
+                  textShadow: '0 2px 14px rgba(0, 0, 0, 0.5)',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif"
+                }}
+              >
+                The experts in<br />maritime logistics.
+              </div>
+            </div>
+          </div>
+
+          {/* Lower Hero Content: Left Paragraph + Center Scroll Indicator */}
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              marginTop: 'clamp(2rem, 5.5vh, 4.5rem)',
+              marginBottom: '1rem',
+              flexWrap: 'wrap',
+              gap: '1.5rem'
+            }}
+          >
+            {/* Left Description Paragraph */}
+            <p 
+              style={{
+                maxWidth: '430px',
+                fontSize: '0.92rem',
+                color: 'rgba(255, 255, 255, 0.90)',
+                lineHeight: 1.55,
+                margin: 0,
+                fontWeight: 500,
+                textShadow: '0 2px 10px rgba(0, 0, 0, 0.6)'
+              }}
+            >
+              As one of India's largest dry bulk commercial decision systems, we optimize millions of tonnes of coking coal and raw materials every year for Steel Authority of India Limited.
+            </p>
+
+            {/* Center Subtle Scroll Cue */}
+            <div 
+              onClick={() => {
+                const el = document.getElementById('explore-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.35rem',
+                color: 'rgba(255, 255, 255, 0.72)',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                letterSpacing: '0.02em',
+                userSelect: 'none',
+                transition: 'color 0.2s',
+                marginBottom: '0.35rem'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.72)'}
+            >
+              <span>(Scroll down for more)</span>
+            </div>
+
+            <div style={{ width: '40px' }} />
+          </div>
+        </div>
+
+        {/* BOTTOM DOCKED SPLIT CARDS (Matching Behance) */}
+        <div 
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))'
+          }}
+        >
+          {/* CARD 1: Cobalt Blue (Left) */}
+          <div 
+            onClick={() => handleLaunchPlanner()}
+            style={{
+              background: '#1D4ED8',
+              padding: '1.4rem 2.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.15)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#1E40AF'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#1D4ED8'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              {/* Capsule Image */}
+              <div 
+                style={{
+                  width: '130px',
+                  height: '64px',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <img 
+                  src="/navibulk_card_berth.jpg" 
+                  alt="Sea & Ocean bulk carrier at berth" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+
+              <div>
+                <div 
+                  style={{ 
+                    fontSize: '1.24rem', 
+                    fontWeight: 800, 
+                    color: '#FFFFFF', 
+                    lineHeight: 1.2,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                  }}
+                >
+                  Sea & Ocean<br />Dry Bulk Transport.
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.75)', marginTop: '0.35rem', fontWeight: 600 }}>
+                  [About our 10-stage decision pipeline]
+                </div>
+              </div>
+            </div>
+
+            {/* Arrow Button */}
+            <div 
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                background: 'rgba(255, 255, 255, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                flexShrink: 0
+              }}
+            >
+              <ArrowUpRight size={20} />
+            </div>
+          </div>
+
+          {/* CARD 2: Crisp White (Right) */}
+          <div 
+            onClick={() => onNavigate('ports')}
+            style={{
+              background: '#FFFFFF',
+              padding: '1.4rem 2.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              borderTop: '1px solid #E2E8F0'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#FFFFFF'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              {/* Capsule Image */}
+              <div 
+                style={{
+                  width: '130px',
+                  height: '64px',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+                  border: '2px solid #E2E8F0'
+                }}
+              >
+                <img 
+                  src="/navibulk_card_ocean.jpg" 
+                  alt="Vessel sailing in open ocean" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+
+              <div>
+                <div 
+                  style={{ 
+                    fontSize: '1.24rem', 
+                    fontWeight: 800, 
+                    color: '#0F172A', 
+                    lineHeight: 1.2,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                  }}
+                >
+                  See route schedules<br />and find the fitting one.
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '0.35rem', fontWeight: 600 }}>
+                  [Audited East Coast port terminals]
+                </div>
+              </div>
+            </div>
+
+            {/* Arrow Button */}
+            <div 
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1.5px solid #CBD5E1',
+                background: '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#0F172A',
+                flexShrink: 0
+              }}
+            >
+              <ArrowUpRight size={20} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ANCHOR FOR SCROLL DOWN TARGET ── */}
+      <div id="explore-section" />
+
+
+      {/* ── TRUSTED INSTITUTIONAL ECOSYSTEM STRIP ── */}
+      <div 
+        style={{
+          borderBottom: '1px solid #E2E8F0',
+          background: '#FFFFFF',
+          padding: '1.1rem 3.5rem',
+          width: '100%'
+        }}
+      >
+        <div 
+          style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            flexWrap: 'wrap', 
+            gap: '1.5rem' 
+          }}
+        >
+          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            TRUSTED INSTITUTIONAL ECOSYSTEM
+          </div>
+
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '2.5rem', 
+              flexWrap: 'wrap', 
+              fontSize: '0.8rem', 
+              fontWeight: 700, 
+              color: '#475569', 
+              letterSpacing: '0.04em' 
+            }}
+          >
+            <span style={{ color: '#0F172A' }}>STEEL AUTHORITY OF INDIA LIMITED</span>
+            <span>MINISTRY OF STEEL (GOVT. OF INDIA)</span>
+            <span>PARADIP PORT AUTHORITY</span>
+            <span>VISAKHAPATNAM PORT AUTHORITY</span>
+            <span>SYAMA PRASAD MOOKERJEE PORT</span>
+          </div>
+        </div>
+      </div>
+
+
+      {/* ── INTERACTIVE GLOBAL CORRIDOR INTELLIGENCE CONSOLE ── */}
+      <section 
+        id="baltic-rates-section"
+        style={{ 
+          padding: '3.5rem 3.5rem', 
+          background: '#0B1528', 
+          color: '#FFFFFF',
+          borderBottom: '1px solid #1E293B' 
+        }}
+      >
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Corridor Live Switcher Bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
@@ -694,7 +1040,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 border: '1px solid rgba(255, 255, 255, 0.18)',
                 padding: '0.25rem 0.35rem',
                 borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
               }}
               onMouseEnter={() => setIsAutoCycling(false)}
               onMouseLeave={() => setIsAutoCycling(true)}
@@ -740,12 +1086,12 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             </div>
           </div>
 
-          {/* Two-Column Hero Content Grid */}
+          {/* Two-Column Content Grid */}
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.2fr 1fr',
-              gap: '3rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+              gap: '2.5rem',
               alignItems: 'center'
             }}
           >
@@ -755,9 +1101,9 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 Global Dry Bulk • DecisionEngineV2 Projection
               </div>
 
-              <h1 style={{ fontSize: 'clamp(1.7rem, 2.6vw, 2.3rem)', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.25, letterSpacing: '-0.02em', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+              <h2 style={{ fontSize: 'clamp(1.7rem, 2.5vw, 2.2rem)', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.25, letterSpacing: '-0.02em' }}>
                 Model-optimized chartering advantage
-              </h1>
+              </h2>
 
               {/* ROUTE LINE ARC BEHIND NUMBER */}
               <div style={{ position: 'relative', width: '100%', margin: '0.25rem 0 1rem 0' }}>
@@ -769,7 +1115,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                   />
                 </div>
 
-                {/* THE HERO SAVINGS NUMBER */}
+                {/* THE SAVINGS NUMBER */}
                 <div 
                   style={{
                     position: 'relative',
@@ -791,7 +1137,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                       color: '#F59E0B',
                       fontFamily: "var(--font-mono)",
                       fontVariantNumeric: 'tabular-nums',
-                      textShadow: '0 4px 20px rgba(0,0,0,0.8)',
+                      textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)',
                       transition: 'color 200ms ease'
                     }}
                   >
@@ -851,17 +1197,16 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                   </div>
                 </div>
               </div>
-
             </div>
 
-            {/* Right Column: Narrative Card */}
+            {/* Right Column: Interactive Actions & Direct Berth Verification */}
             <div 
               style={{
                 background: 'rgba(15, 23, 42, 0.88)',
                 backdropFilter: 'blur(16px)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '10px',
-                padding: '2.25rem',
+                padding: '2rem',
                 boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -869,15 +1214,15 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
               }}
             >
               <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
-                SAIL NaviBulk Enterprise
+                SAIL NaviBulk Optimization Desk
               </div>
 
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.35 }}>
-                The intelligent operating system for Indian dry bulk logistics.
-              </h2>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.85rem 0', lineHeight: 1.35 }}>
+                Direct econometric fixture execution for {activeCorridor.origin} → {activeCorridor.destination.toUpperCase()}.
+              </h3>
 
-              <p style={{ fontSize: '0.94rem', color: '#CBD5E1', lineHeight: 1.65, margin: '0 0 1.75rem 0', fontWeight: 400 }}>
-                From econometric Baltic freight forecasting to draft-cleared berth routing, SAIL NaviBulk eliminates multi-hundred-thousand-dollar offshore lightering penalties across 7 East Coast Indian ports with empirical certainty.
+              <p style={{ fontSize: '0.92rem', color: '#CBD5E1', lineHeight: 1.6, margin: '0 0 1.5rem 0', fontWeight: 400 }}>
+                {activeCorridor.alphaSource}. Draft clearance of {activeCorridor.draftReq}m verified against destination berth permissible limit ({activeCorridor.berthDraftMax}m).
               </p>
 
               {/* Action Buttons */}
@@ -885,25 +1230,25 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 <button 
                   onClick={() => handleLaunchPlanner(activeCorridor)}
                   style={{
-                    background: '#B45309',
+                    background: '#2563EB',
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '6px',
-                    padding: '0.85rem 1.65rem',
-                    fontSize: '0.92rem',
+                    padding: '0.75rem 1.45rem',
+                    fontSize: '0.88rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.65rem',
-                    boxShadow: '0 2px 8px rgba(180, 83, 9, 0.4)',
+                    gap: '0.5rem',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
                     transition: 'all 0.15s ease'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#92400E'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#B45309'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#1D4ED8'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#2563EB'}
                 >
                   <span>Simulate Voyage Economics</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={15} />
                 </button>
 
                 <button 
@@ -913,8 +1258,8 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                     color: '#FFFFFF',
                     border: '1px solid rgba(255, 255, 255, 0.25)',
                     borderRadius: '6px',
-                    padding: '0.85rem 1.55rem',
-                    fontSize: '0.92rem',
+                    padding: '0.75rem 1.35rem',
+                    fontSize: '0.88rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
@@ -936,52 +1281,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
           </div>
         </div>
       </section>
-
-
-      {/* ── TRUSTED INSTITUTIONAL ECOSYSTEM STRIP ── */}
-      <div 
-        style={{
-          borderBottom: '1px solid #E2E8F0',
-          background: '#FFFFFF',
-          padding: '1.1rem 3.5rem',
-          width: '100%'
-        }}
-      >
-        <div 
-          style={{ 
-            maxWidth: '1400px', 
-            margin: '0 auto', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            flexWrap: 'wrap', 
-            gap: '1.5rem' 
-          }}
-        >
-          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            TRUSTED INSTITUTIONAL ECOSYSTEM
-          </div>
-
-          <div 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '2.5rem', 
-              flexWrap: 'wrap', 
-              fontSize: '0.8rem', 
-              fontWeight: 700, 
-              color: '#475569', 
-              letterSpacing: '0.04em' 
-            }}
-          >
-            <span style={{ color: '#0F172A' }}>STEEL AUTHORITY OF INDIA LIMITED</span>
-            <span>MINISTRY OF STEEL (GOVT. OF INDIA)</span>
-            <span>PARADIP PORT AUTHORITY</span>
-            <span>VISAKHAPATNAM PORT AUTHORITY</span>
-            <span>SYAMA PRASAD MOOKERJEE PORT</span>
-          </div>
-        </div>
-      </div>
 
 
       {/* ── SECTION 1: "WHAT WE DO" (Clean Editorial Cards) ── */}

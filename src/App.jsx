@@ -21,6 +21,7 @@ function AppWorkspace() {
   const { handleRequirementChange, setActiveStage } = useDecisionEngine();
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'decision' | 'ports'
   const [isMethodologyModalOpen, setIsMethodologyModalOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 1. STANDALONE HOMEPAGE ENTITY (Zero sidebar, zero topbar, zero white borders)
   if (activeTab === 'home') {
@@ -73,10 +74,12 @@ function AppWorkspace() {
         position: 'relative'
       }}
     >
-      {/* 232px Desktop Minimal Workstation Sidebar */}
+      {/* Workstation Sidebar with Collapse/Expand Capability */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
         onOpenPortsModal={() => setActiveTab('ports')}
         onOpenMethodologyModal={() => setIsMethodologyModalOpen(true)}
       />
@@ -89,13 +92,16 @@ function AppWorkspace() {
           minWidth: 0, 
           display: 'flex', 
           flexDirection: 'column',
-          background: 'var(--bg-app, #F8FAFC)'
+          background: 'var(--bg-app, #F8FAFC)',
+          transition: 'all 0.2s ease'
         }}
       >
-        {/* Compact 56px Top Bar */}
+        {/* Compact, Decluttered Top Bar */}
         <TopBar 
           activeTab={activeTab}
           onSelectTab={setActiveTab}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(prev => !prev)}
           onOpenMethodologyModal={() => setIsMethodologyModalOpen(true)} 
         />
 

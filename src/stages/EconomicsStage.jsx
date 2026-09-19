@@ -43,105 +43,109 @@ export default function EconomicsStage() {
     <StageShell
       stageId="economics"
       conclusion={conclusionText}
-      nextActionLabel="Build Optimized Base Plan →"
+      nextActionLabel="Build Optimized Base Plan"
       onNextAction={() => advanceStage('economics')}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         
         {/* ── 1. DELIVERED COST WATERFALL CARDS ── */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
+        <div className="analytical-card" style={{ borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Layers size={17} color="#2563EB" />
-              <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Delivered Cost Composition ({recommendedVessel?.vesselName || 'Nominated Vessel'})
+              <Layers size={17} color="var(--accent-blue)" />
+              <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Delivered Cost Decomposition ({recommendedVessel?.vesselName || 'Nominated Vessel'})
               </h2>
             </div>
-            <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600 }}>
-              Consignment: <strong>{inputs.tonnage.toLocaleString()} MT</strong> • Speed: <strong style={{ color: '#2563EB' }}>{currentSpeed.toFixed(1)} kn</strong>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="provenance-label">VOYAGE COST DECOMPOSITION</span>
+              <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                Consignment: <strong>{inputs.tonnage.toLocaleString()} MT</strong> • Speed: <strong style={{ color: 'var(--accent-blue)', fontFamily: 'var(--font-mono)' }}>{currentSpeed.toFixed(1)} kn</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Primary Dominant Landed Outcome Metric */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', background: 'var(--surface-app)', border: '1px solid var(--border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
+            <div>
+              <span className="section-eyebrow" style={{ fontSize: '0.68rem' }}>
+                TOTAL DELIVERED COST / METRIC TONNE
+              </span>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-blue-dark)', fontFamily: 'var(--font-mono)', lineHeight: 1.1, marginTop: '0.2rem' }}>
+                ${baseDeliveredCost.totalLanded} <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>USD / MT</span>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span className="section-eyebrow" style={{ fontSize: '0.68rem' }}>
+                Total Financial Commitment (Outlay)
+              </span>
+              <div style={{ display: 'flex', gap: '1rem', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  ${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD
+                </span>
+                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent-blue)' }}>
+                  ₹{baseDeliveredCost.totalOutlayInrCr} Cr INR
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Waterfall Visual Blocks */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '0.65rem', alignItems: 'center' }}>
             
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.85rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Ocean Freight</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface-app)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem' }}>
+              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Ocean Freight</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
                 ${baseDeliveredCost.freightPortion}
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>70% Baltic Index</div>
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Baltic Base</div>
             </div>
 
-            <div style={{ textAlign: 'center', color: '#94A3B8', fontWeight: 800 }}>+</div>
+            <div style={{ textAlign: 'center', color: 'var(--border-strong)', fontWeight: 800 }}>+</div>
 
-            <div style={{ background: '#EFF6FF', border: '1.5px solid #93C5FD', borderRadius: '6px', padding: '0.85rem', position: 'relative' }}>
+            <div style={{ background: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: '10px', padding: '0.85rem', position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: '#1E40AF', textTransform: 'uppercase' }}>Bunker (VLSFO)</span>
-                <span style={{ fontSize: '0.6rem', fontWeight: 700, background: '#DBEAFE', color: '#1E40AF', padding: '0.05rem 0.35rem', borderRadius: '3px' }}>DYNAMIC</span>
+                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: 'var(--accent-blue-dark)', textTransform: 'uppercase' }}>Bunker (VLSFO)</span>
+                <span className="pill-badge status-cobalt" style={{ fontSize: '0.55rem', padding: '0.05rem 0.3rem' }}>DYNAMIC</span>
               </div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1E40AF', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-blue-dark)', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
                 ${baseDeliveredCost.bunkerPortion}
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#2563EB', marginTop: '0.2rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.66rem', color: 'var(--accent-blue)', marginTop: '0.2rem', fontWeight: 600 }}>
                 {baseDeliveredCost.curBurnTpd} TPD @ {currentSpeed.toFixed(1)} kn
               </div>
             </div>
 
-            <div style={{ textAlign: 'center', color: '#94A3B8', fontWeight: 800 }}>+</div>
+            <div style={{ textAlign: 'center', color: 'var(--border-strong)', fontWeight: 800 }}>+</div>
 
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.85rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Port Dues / Pilot</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface-app)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem' }}>
+              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Port Dues / Pilot</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
                 ${baseDeliveredCost.portDuesPortion}
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>7% Tariff</div>
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Tariff Schedule</div>
             </div>
 
-            <div style={{ textAlign: 'center', color: '#94A3B8', fontWeight: 800 }}>+</div>
+            <div style={{ textAlign: 'center', color: 'var(--border-strong)', fontWeight: 800 }}>+</div>
 
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.85rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Lightering Fee</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: baseDeliveredCost.lighteringFee > 0 ? '#B45309' : '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface-app)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem' }}>
+              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Lightering Fee</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: baseDeliveredCost.lighteringFee > 0 ? 'var(--warning)' : 'var(--text-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
                 ${baseDeliveredCost.lighteringFee.toFixed(2)}
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>Sagar Transshipment</div>
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Transshipment</div>
             </div>
 
-            <div style={{ textAlign: 'center', color: '#94A3B8', fontWeight: 800 }}>+</div>
+            <div style={{ textAlign: 'center', color: 'var(--border-strong)', fontWeight: 800 }}>+</div>
 
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.85rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Demurrage Buffer</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface-app)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem' }}>
+              <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Demurrage Buffer</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
                 ${baseDeliveredCost.demurragePortion}
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#94A3B8', marginTop: '0.2rem' }}>Laytime Buffer</div>
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Congestion Risk</div>
             </div>
 
-            <div style={{ textAlign: 'center', color: '#2563EB', fontWeight: 900, fontSize: '1.2rem' }}>=</div>
-
-            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '6px', padding: '0.85rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase' }}>Delivered Outcome</div>
-              <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#1E40AF', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
-                ${baseDeliveredCost.totalLanded}
-              </div>
-              <div style={{ fontSize: '0.66rem', color: '#1E40AF', fontWeight: 700, marginTop: '0.2rem' }}>/ MT Landed</div>
-            </div>
-
-          </div>
-
-          <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '0.75rem 1rem', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
-            <span style={{ fontSize: '0.78rem', color: '#475569' }}>
-              Total Financial Commitment (Landed):
-            </span>
-            <div style={{ display: 'flex', gap: '1.5rem', fontFamily: 'var(--font-mono)' }}>
-              <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0F172A' }}>
-                ${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD
-              </span>
-              <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#2563EB' }}>
-                ₹{baseDeliveredCost.totalOutlayInrCr} Cr INR
-              </span>
-            </div>
           </div>
         </div>
 
@@ -326,7 +330,7 @@ export default function EconomicsStage() {
             <p style={{ margin: '0.35rem 0 0', fontSize: '0.8rem', color: hasCheaperHeadlineTrap ? '#78350F' : '#14532D', lineHeight: 1.5 }}>
               {hasCheaperHeadlineTrap ? (
                 <>
-                  While Capesize offers a lower nominal ocean freight rate (${capesizeCandidate.costPerTonneUsd}/MT), the draft constraint at {inputs.destinationPortKey.toUpperCase()} forces lightering at Sagar anchorage (+$4.20/MT transshipment fee + delay penalty), making {panamaxCandidate.vesselName} ($18.20/MT direct discharge) the commercially optimal choice.
+                  While Capesize offers a lower nominal ocean freight rate (${capesizeCandidate.costPerTonneUsd}/MT), the draft constraint at {inputs.destinationPortKey.toUpperCase()} forces lightering at Sagar anchorage (+$4.20/MT transshipment fee + delay penalty), making {panamaxCandidate?.vesselName || 'Panamax'} (${(panamaxCandidate?.costPerTonneUsd || 18.20).toFixed(2)}/MT direct discharge) the commercially optimal choice.
                 </>
               ) : (
                 <>
@@ -375,10 +379,10 @@ export default function EconomicsStage() {
                       {v.vesselName} {isWinner && <span style={{ fontSize: '0.65rem', background: '#2563EB', color: '#FFF', padding: '0.1rem 0.35rem', borderRadius: '3px', marginLeft: '0.35rem' }}>OPTIMAL</span>}
                     </td>
                     <td style={{ padding: '0.65rem 0.5rem', fontFamily: 'var(--font-mono)' }}>
-                      ${(v.costPerTonneUsd * 0.70).toFixed(2)}
+                      ${v.freightPerMt ? v.freightPerMt.toFixed(2) : (v.costPerTonneUsd * 0.70).toFixed(2)}
                     </td>
                     <td style={{ padding: '0.65rem 0.5rem', fontFamily: 'var(--font-mono)' }}>
-                      ${(v.costPerTonneUsd * 0.25).toFixed(2)}
+                      ${v.bunkerAndPortPerMt ? v.bunkerAndPortPerMt.toFixed(2) : (v.costPerTonneUsd * 0.25).toFixed(2)}
                     </td>
                     <td style={{ padding: '0.65rem 0.5rem', fontFamily: 'var(--font-mono)', color: lightering > 0 ? '#B45309' : '#64748B' }}>
                       {lightering > 0 ? `+$${lightering.toFixed(2)}/MT` : '$0.00'}

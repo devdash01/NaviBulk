@@ -19,11 +19,12 @@ export default function BackhaulMonetizerView({ initialPort = 'paradip', initial
 
   const activeLeg = repositioningLegs.find((l) => l.id === activeLegId) || repositioningLegs[0];
 
-  const cargoTonnage = vessel.avgDwt || 75000;
-  const estRate = activeLeg?.estRatePerTonneUsd || 14.8;
-  const grossFreightRevenue = cargoTonnage * estRate;
-  const netBenefit = activeLeg?.netRepositioningBenefitUsd || 285000;
-  const additionalFuelCost = Math.round(grossFreightRevenue - netBenefit);
+  const cargoTonnage = activeLeg?.cargoTonnage || vessel.avgDwt || 75000;
+  const estRate = activeLeg?.estRatePerTonneUsd || 14.80;
+  const grossFreightRevenue = activeLeg?.grossFreightRevenue || Math.round(cargoTonnage * estRate);
+  const voyageFuelCostUsd = activeLeg?.voyageFuelCostUsd || Math.round((activeLeg?.distanceNm / (13.5 * 24)) * 28 * 829.50);
+  const portDuesUsd = activeLeg?.portDuesUsd || (18500 + Math.round(cargoTonnage * 0.35));
+  const netBenefit = activeLeg?.netRepositioningBenefitUsd || Math.max(0, grossFreightRevenue - voyageFuelCostUsd - portDuesUsd);
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -197,16 +198,21 @@ export default function BackhaulMonetizerView({ initialPort = 'paradip', initial
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.5rem' }}>
               <span style={{ color: '#64748B' }}>Gross Commercial Freight Revenue:</span>
-              <strong style={{ fontFamily: 'var(--font-mono)', color: '#0F172A' }}>${grossFreightRevenue.toLocaleString()} USD</strong>
+              <strong style={{ fontFamily: 'var(--font-mono)', color: '#0F172A' }}>+${grossFreightRevenue.toLocaleString()} USD</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.5rem' }}>
-              <span style={{ color: '#64748B' }}>Additional Deviational Fuel:</span>
-              <strong style={{ fontFamily: 'var(--font-mono)', color: '#B91C1C' }}>-${additionalFuelCost.toLocaleString()} USD</strong>
+              <span style={{ color: '#64748B' }}>Voyage Bunker Fuel Burn ({activeLeg?.voyageFuelTonne || 380} MT VLSFO):</span>
+              <strong style={{ fontFamily: 'var(--font-mono)', color: '#B91C1C' }}>-${voyageFuelCostUsd.toLocaleString()} USD</strong>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.5rem' }}>
+              <span style={{ color: '#64748B' }}>Estimated Port Dues & Stevedoring:</span>
+              <strong style={{ fontFamily: 'var(--font-mono)', color: '#B91C1C' }}>-${portDuesUsd.toLocaleString()} USD</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1.5px solid #E2E8F0', paddingTop: '0.75rem', fontSize: '0.95rem' }}>
-              <span style={{ fontWeight: 700, color: '#0F172A' }}>Net Fleet Subsidy Benefit:</span>
+              <span style={{ fontWeight: 700, color: '#0F172A' }}>Net Fleet Repositioning Subsidy:</span>
               <strong style={{ fontFamily: 'var(--font-mono)', color: '#1E7E56', fontSize: '1.25rem' }}>
                 +${netBenefit.toLocaleString()} USD
               </strong>
@@ -216,7 +222,7 @@ export default function BackhaulMonetizerView({ initialPort = 'paradip', initial
           {/* Environmental Decarbonization Note */}
           <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '4px', padding: '0.85rem', fontSize: '0.82rem', color: '#166534', lineHeight: 1.5 }}>
             <div style={{ fontWeight: 700, marginBottom: '0.2rem' }}>IMO MARPOL / CII Compliance:</div>
-            Repositioning under revenue-earning cargo avoids unproductive empty deadhead emissions, cutting voyage carbon intensity by ~{activeLeg?.deadheadReductionPct || 74}%.
+            Repositioning under revenue-earning cargo avoids unproductive empty deadhead emissions, cutting voyage carbon intensity by ~{activeLeg?.deadheadReductionPct || 74}% (-{activeLeg?.co2SavedMt || 420} MT CO₂).
           </div>
         </div>
 

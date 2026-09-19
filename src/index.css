@@ -8,76 +8,204 @@
 ═══════════════════════════════════════════════════════════════ */
 :root {
   /* ═══════════════════════════════════════════════════════════════
-     LIGHT ENTERPRISE MARITIME WORKSTATION PALETTE
-     Warm white #F8FAFC, crisp white #FFFFFF, deep navy #0F172A,
-     hairline border #E2E8F0, steel blue #2563EB, restrained brass #B45309
+     LIGHT ENTERPRISE MARITIME WORKSTATION PALETTE (Transocean Editorial)
   ═══════════════════════════════════════════════════════════════ */
-  --bg-app: #F8FAFC;         /* Soft slate / warm white application background */
+  --surface-app: #F8FAFC;
+  --surface-card: #FFFFFF;
+  --bg-app: #F8FAFC;
   --bg-app-warm: #F8FAFC;
-  --bg-surface: #FFFFFF;     /* Crisp white panel / card surface */
-  --bg-surface-elevated: #F1F5F9; /* Subtle elevated container */
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F1F5F9;
   --bg-surface-hover: #F8FAFC;
   --bg-header: #FFFFFF;
   --bg-card: #FFFFFF;
 
   /* Aliases for legacy component compatibility */
-  --graphite-900: #F8FAFC;   /* Main canvas background */
-  --graphite-800: #FFFFFF;   /* Primary card / top bar surface */
-  --graphite-700: #FFFFFF;   /* Card surface */
-  --graphite-600: #F1F5F9;   /* Subdued fill / hover */
-  --hairline: #E2E8F0;       /* Crisp hairline borders */
+  --graphite-900: #F8FAFC;
+  --graphite-800: #FFFFFF;
+  --graphite-700: #FFFFFF;
+  --graphite-600: #F1F5F9;
+  --hairline: #E2E8F0;
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-subtle: #E2E8F0;
+  --border-medium: #CBD5E1;
   
-  --navy-sidebar: #0F172A;   /* Deep maritime navy sidebar */
+  --navy-sidebar: #0B1528;   /* Deep Oceanic Navy matching homepage */
+  --navy-deep: #0F172A;
+  --navy-card: #111C30;
   --navy-active: #1E293B;
   --navy-header: #FFFFFF;
   --accent-navy: #0F172A;
-  --accent-blue: #2563EB;    /* Steel blue primary action */
+
+  --accent-blue: #2563EB;    /* Cobalt blue primary action */
+  --accent-blue-dark: #1D4ED8;
+  --accent-blue-soft: #EFF6FF;
   --accent-steel: #475569;
 
-  --brass: #B45309;          /* Restrained amber/brass: commercial highlights */
-  --brass-bright: #D97706;   /* Active amber */
-  --brass-dim: #FEF3C7;      /* Amber tint badge background */
-  --brass-text: #92400E;     /* High-contrast amber text */
+  --success: #16A34A;
+  --success-soft: #DCFCE7;
+  --gain: #16A34A;
+  --gain-dim: #DCFCE7;
+  --gain-text: #166534;
 
-  --gain: #16A34A;           /* Economic savings / positive feasibility */
-  --gain-dim: #DCFCE7;       /* Soft green pill background */
-  --gain-text: #166534;      /* Crisp dark green text */
-
-  --loss: #DC2626;           /* Financial losses / high risk / deficits */
-  --loss-dim: #FEE2E2;       /* Soft red pill background */
-  --loss-text: #991B1B;      /* Crisp dark red text */
-
-  --warn: #D97706;           /* Caution / medium risk / demurrage */
-  --warn-dim: #FEF3C7;       /* Soft amber pill background */
+  --warning: #B45309;
+  --warning-soft: #FEF3C7;
+  --brass: #B45309;
+  --brass-bright: #D97706;
+  --brass-dim: #FEF3C7;
+  --brass-text: #92400E;
+  --warn: #D97706;
+  --warn-dim: #FEF3C7;
   --warn-text: #92400E;
 
-  --data-cyan: #0284C7;      /* Chart data series */
+  --danger: #DC2626;
+  --danger-soft: #FEE2E2;
+  --loss: #DC2626;
+  --loss-dim: #FEE2E2;
+  --loss-text: #991B1B;
+
+  --data-cyan: #0284C7;
   
-  --text-hi: #0F172A;        /* Headlines, hero numbers, titles */
-  --text-mid: #334155;       /* Body copy, labels, values */
-  --text-low: #64748B;       /* Captions, subtle metadata, stamps */
-
-  --border-subtle: #E2E8F0;
-  --border-medium: #CBD5E1;
-  --border-brass: rgba(180, 83, 9, 0.3);
-
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-hi: #0F172A;
+  --text-mid: #334155;
+  --text-low: #64748B;
   --text-hero: var(--text-hi);
   --text-main: var(--text-hi);
-  --text-primary: var(--text-hi);
-  --text-secondary: var(--text-mid);
-  --text-muted: var(--text-low);
   --text-dim: var(--text-low);
 
-  /* Typography */
-  --font-display: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Radius System */
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --radius-pill: 9999px;
+
+  /* Typography System */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Sophisticated Light Enterprise Shadows */
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  /* Institutional Restrained Elevation (Zero aggressive cyan glow) */
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UNIFIED DESIGN SYSTEM UTILITY CLASSES
+═══════════════════════════════════════════════════════════════ */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-success {
+  background: var(--success-soft);
+  color: var(--success);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.status-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+}
+
+.status-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.status-cobalt {
+  background: var(--accent-blue-soft);
+  color: var(--accent-blue);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.btn-cobalt {
+  background: var(--accent-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-control);
+  padding: 0.65rem 1.4rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  transition: all 0.16s ease;
+}
+.btn-cobalt:hover {
+  background: var(--accent-blue-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.btn-secondary {
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 0.55rem 1.15rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.16s ease;
+}
+.btn-secondary:hover {
+  background: var(--surface-app);
+  border-color: var(--border-strong);
+}
+
+.section-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.analytical-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+.provenance-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 /* ═══════════════════════════════════════════════════════════════

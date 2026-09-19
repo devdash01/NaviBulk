@@ -35,7 +35,8 @@ export default function DecisionStage() {
     primaryRisk,
     nextActionInfo,
     adoptedCandidateBranch,
-    subIndexKey
+    subIndexKey,
+    contractEvaluations
   } = useDecisionEngine();
 
   const [isLockModalOpen, setIsLockModalOpen] = useState(false);
@@ -44,6 +45,8 @@ export default function DecisionStage() {
 
   const destPort = EAST_COAST_PORTS[inputs.destinationPortKey] || EAST_COAST_PORTS.paradip;
   const destDraft = destPort.maxDraft || destPort.maxDraftM || destPort.cargoBerths?.maxDraft || 14.5;
+  const dailyDemurragePerMt = Number(((recommendedVessel?.currentTce || 14500) / (inputs.tonnage || 70000)).toFixed(2));
+  const bunkerSensitivityPerMt = Number(((20 / (baseDeliveredCost.bunkerPrice || 829.50)) * baseDeliveredCost.bunkerPortion).toFixed(2));
 
   // Causal "Why this recommendation" bullets derived 100% from engine data
   const whyBullets = [
@@ -57,33 +60,39 @@ export default function DecisionStage() {
   // Dynamic what could change bullets
   const whatCouldChange = [
     `Freight Rate Inflection: If the forward ${subIndexKey} curve reverses by more than 5.0% over the next 5 days, commitment strategy should escalate or de-escalate between BUY NOW and WAIT.`,
-    `Port Congestion Delay: If pre-berthing wait times at ${destPort.name} exceed 5 days, demurrage accumulation (+$0.35/MT/day) triggers an immediate 100% fixture lock to protect laytime terms.`,
-    `Bunker Fuel Spikes: A >$20/MT jump in VLSFO bunkering prices at load port shifts voyage economics by +$${(baseDeliveredCost.bunkerPortion * 0.20).toFixed(2)}/MT, favoring period contracts with bunker adjustment clauses.`,
+    `Port Congestion Delay: If pre-berthing wait times at ${destPort.name} exceed 5 days, demurrage accumulation (+$${dailyDemurragePerMt}/MT/day at $${(recommendedVessel?.currentTce || 14500).toLocaleString()}/day hire) triggers an immediate 100% fixture lock to protect laytime terms.`,
+    `Bunker Fuel Spikes: A >$20/MT jump in VLSFO bunkering prices at load port shifts voyage economics by +$${bunkerSensitivityPerMt}/MT, favoring period contracts with bunker adjustment clauses.`,
     `Alternative Origin Clearance: If candidate origins (such as Mozambique or US) obtain certified SAIL blast-furnace blend approval, cross-basin arbitrage may justify supplier diversification.`
   ];
 
   return (
-    <div className="decision-stage-root" style={{ width: '100%', maxWidth: '1240px', margin: '0 auto' }}>
+    <div className="decision-stage-root" style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', paddingBottom: '3rem' }}>
       
       {/* ── TOP HEADER WITH ACTION BUTTONS ── */}
       <div 
         style={{
-          background: '#0F172A',
+          background: 'var(--navy-sidebar)',
           color: '#FFFFFF',
-          borderRadius: '8px 8px 0 0',
+          borderRadius: '12px 12px 0 0',
           padding: '1.5rem 2rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '1rem'
+          gap: '1rem',
+          boxShadow: '0 4px 6px -1px rgba(15, 23, 42, 0.1)'
         }}
       >
         <div>
-          <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Stage 10 · Commercial Chartering Requisition
-          </span>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0.2rem 0 0.15rem', letterSpacing: '-0.02em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+            <span className="pill-badge status-cobalt" style={{ fontSize: '0.65rem' }}>
+              STAGE 10
+            </span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Commercial Chartering Requisition
+            </span>
+          </div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0.2rem 0 0.15rem', letterSpacing: '-0.02em' }}>
             Executive Commercial Decision Brief
           </h1>
           <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>
@@ -98,14 +107,15 @@ export default function DecisionStage() {
               background: '#1E293B',
               color: '#F8FAFC',
               border: '1px solid #334155',
-              borderRadius: '6px',
-              padding: '0.45rem 0.85rem',
+              borderRadius: '10px',
+              padding: '0.5rem 0.95rem',
               fontSize: '0.78rem',
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.35rem'
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
             }}
           >
             <Printer size={14} />
@@ -114,40 +124,37 @@ export default function DecisionStage() {
 
           <button
             onClick={() => setIsLockModalOpen(true)}
+            className="btn-cobalt"
             style={{
-              background: '#2563EB',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '0.45rem 1rem',
+              borderRadius: '10px',
+              padding: '0.5rem 1.1rem',
               fontSize: '0.78rem',
-              fontWeight: 700,
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+              gap: '0.45rem'
             }}
           >
             <FileCheck size={14} />
             <span>Prepare Requisition</span>
+            <span style={{ fontSize: '0.9rem', lineHeight: 1 }}>↗</span>
           </button>
         </div>
       </div>
 
       {/* ── SUB-NAVIGATION TABS (Decision Brief vs Savings Ledger) ── */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '0 2rem', display: 'flex', gap: '1.5rem' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)', padding: '0 2rem', display: 'flex', gap: '1.5rem' }}>
         <button
           onClick={() => setActiveTab('brief')}
           style={{
             background: 'transparent',
             border: 'none',
-            borderBottom: activeTab === 'brief' ? '2px solid #2563EB' : '2px solid transparent',
-            padding: '0.75rem 0',
+            borderBottom: activeTab === 'brief' ? '2.5px solid var(--accent-blue)' : '2.5px solid transparent',
+            padding: '0.85rem 0',
             fontSize: '0.82rem',
-            fontWeight: 700,
-            color: activeTab === 'brief' ? '#2563EB' : '#64748B',
-            cursor: 'pointer'
+            fontWeight: activeTab === 'brief' ? 800 : 600,
+            color: activeTab === 'brief' ? 'var(--accent-blue)' : 'var(--text-muted)',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
           }}
         >
           Executive Requisition Brief
@@ -157,12 +164,13 @@ export default function DecisionStage() {
           style={{
             background: 'transparent',
             border: 'none',
-            borderBottom: activeTab === 'ledger' ? '2px solid #2563EB' : '2px solid transparent',
-            padding: '0.75rem 0',
+            borderBottom: activeTab === 'ledger' ? '2.5px solid var(--accent-blue)' : '2.5px solid transparent',
+            padding: '0.85rem 0',
             fontSize: '0.82rem',
-            fontWeight: 700,
-            color: activeTab === 'ledger' ? '#2563EB' : '#64748B',
-            cursor: 'pointer'
+            fontWeight: activeTab === 'ledger' ? 800 : 600,
+            color: activeTab === 'ledger' ? 'var(--accent-blue)' : 'var(--text-muted)',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
           }}
         >
           Savings Ledger & Financial Audit
@@ -251,6 +259,99 @@ export default function DecisionStage() {
 
             </div>
           </div>
+
+          {/* ── CUMULATIVE TOTAL COST OPTIMIZATION LEDGER ── */}
+          {(() => {
+            const timingSavingsUsd = Math.round(timingEval?.totalSavingsUsd || (inputs.tonnage * (timingEval?.savingsPerTonneUsd || 1.40)));
+            const timingSavingsPerMt = Number((timingSavingsUsd / inputs.tonnage).toFixed(2));
+            const lighteringAvoidancePerMt = recommendedVessel?.feasibility?.requiresSagarTransshipment ? 0.0 : 4.20;
+            const lighteringAvoidanceUsd = Math.round(lighteringAvoidancePerMt * inputs.tonnage);
+            const speedBunkerSavingsUsd = Math.round(baseDeliveredCost?.speedBunkerSavingsUsd || 0);
+            const speedBunkerSavingsPerMt = baseDeliveredCost?.speedBunkerSavingsPerMt || Number((speedBunkerSavingsUsd / inputs.tonnage).toFixed(2));
+            const coaEval = contractEvaluations?.find(c => c.strategyKey === 'COA');
+            const coaSavingsUsd = Math.round(coaEval?.savingsVsSpotUsd || (inputs.tonnage * 0.85));
+            const coaSavingsPerMt = coaEval?.savingsPerMt || Number((coaSavingsUsd / inputs.tonnage).toFixed(2));
+
+            const totalAuditSavingsUsd = timingSavingsUsd + lighteringAvoidanceUsd + speedBunkerSavingsUsd + coaSavingsUsd;
+            const totalAuditSavingsPerMt = Number((totalAuditSavingsUsd / inputs.tonnage).toFixed(2));
+            const totalAuditSavingsInrCr = Number(((totalAuditSavingsUsd * 83.2) / 10000000).toFixed(2));
+            const unoptimizedBaselineLanded = Number((baseDeliveredCost.totalLanded + totalAuditSavingsPerMt).toFixed(2));
+
+            return (
+              <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '8px', padding: '1.25rem 1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Sparkles size={17} color="#16A34A" />
+                    <div>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#166534', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                        Executive Landed Cost Optimization Audit
+                      </span>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#14532D', margin: 0 }}>
+                        Cumulative Financial Value Delivered Across All 10 Decision Stages
+                      </h3>
+                      <div style={{ fontSize: '0.72rem', color: '#15803D', marginTop: '0.15rem' }}>
+                        Compared against unoptimized prompt spot baseline (${unoptimizedBaselineLanded}/MT • ${(Math.round(unoptimizedBaselineLanded * inputs.tonnage)).toLocaleString()} USD)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#16A34A', color: '#FFFFFF', padding: '0.45rem 0.95rem', borderRadius: '6px', textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.64rem', textTransform: 'uppercase', fontWeight: 700, display: 'block' }}>Net Capital Saved</span>
+                    <span style={{ fontSize: '1.35rem', fontWeight: 900, fontFamily: 'var(--font-mono)' }}>
+                      +${totalAuditSavingsUsd.toLocaleString()} USD
+                    </span>
+                    <span style={{ fontSize: '0.7rem', display: 'block', fontWeight: 700 }}>
+                      (₹{totalAuditSavingsInrCr} Cr • -${totalAuditSavingsPerMt}/MT Consignment Benefit)
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.65rem' }}>
+                  <div style={{ background: '#FFFFFF', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.75rem' }}>
+                    <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase' }}>1. Market Timing Optimization</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#16A34A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+                      +${timingSavingsUsd.toLocaleString()} USD
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      -${timingSavingsPerMt.toFixed(2)}/MT via {timingEval?.optimalDaysToWait ? `${timingEval.optimalDaysToWait}-day` : 'laycan'} trough fixture
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#FFFFFF', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.75rem' }}>
+                    <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase' }}>2. Fleet Sizing & Keel Clearance</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#16A34A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+                      +${lighteringAvoidanceUsd.toLocaleString()} USD
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      {lighteringAvoidancePerMt > 0
+                        ? `-$${lighteringAvoidancePerMt.toFixed(2)}/MT saved (avoided Sandheads/Sagar lightering)`
+                        : `Draft verified for direct discharge at ${destPort.name}`}
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#FFFFFF', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.75rem' }}>
+                    <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase' }}>3. Hydrodynamic Speed Optimization</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#16A34A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+                      +${speedBunkerSavingsUsd.toLocaleString()} USD
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      -${speedBunkerSavingsPerMt}/MT • -{baseDeliveredCost?.co2SavedTons || 0} MT CO₂
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#FFFFFF', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.75rem' }}>
+                    <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase' }}>4. Contract COA Volume Collar</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#16A34A', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+                      +${coaSavingsUsd.toLocaleString()} USD
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      -${coaSavingsPerMt.toFixed(2)}/MT charterer volume discount
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ── 2. WHY THIS RECOMMENDATION (CAUSAL BULLETS) ── */}
           <div>

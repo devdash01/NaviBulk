@@ -2,7 +2,6 @@
 // Renders exactly ONE focused analytical stage workspace at a time based on activeStage state
 import React from 'react';
 import { useDecisionEngine } from '../context/DecisionContext.jsx';
-import StageGate from './StageGate.jsx';
 
 // Stage Component Workspaces
 import RequirementStage from '../stages/RequirementStage.jsx';
@@ -21,10 +20,7 @@ export default function StageRouter() {
 
   const currentStatus = stageStatuses[activeStage] || 'not_started';
 
-  // If the stage has not been analyzed or requires reanalysis (and is not requirement itself)
-  if (activeStage !== 'requirement' && (currentStatus === 'not_started' || currentStatus === 'requires_reanalysis')) {
-    return <StageGate stageId={activeStage} status={currentStatus} />;
-  }
+  // Seamless real-time rendering of all analytical stages
 
   // Render the single focused analytical stage
   switch (activeStage) {
