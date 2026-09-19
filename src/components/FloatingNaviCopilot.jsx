@@ -332,7 +332,7 @@ export default function FloatingNaviCopilot({
 
     try {
       const apiKey = localStorage.getItem('gemini_api_key') || '';
-      const resp = await fetch('http://127.0.0.1:8000/api/ai/copilot', {
+      const resp = await fetch('/api/ai/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

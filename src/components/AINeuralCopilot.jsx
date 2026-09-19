@@ -88,7 +88,7 @@ export default function AINeuralCopilot({
   const fetchLiveMarineWeather = async () => {
     setLoadingWeather(true);
     try {
-      const resp = await fetch(`http://127.0.0.1:8000/api/weather/marine?lat=${activePort.lat}&lon=${activePort.lon}&port_name=${encodeURIComponent(activePort.name)}`);
+      const resp = await fetch(`/api/weather/marine?lat=${activePort.lat}&lon=${activePort.lon}&port_name=${encodeURIComponent(activePort.name)}`);
       if (resp.ok) {
         const data = await resp.json();
         setLiveWeather(data);
@@ -141,7 +141,7 @@ export default function AINeuralCopilot({
     const promptText = customQueryText;
 
     try {
-      const resp = await fetch('http://127.0.0.1:8000/api/ai/copilot', {
+      const resp = await fetch('/api/ai/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
