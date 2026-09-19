@@ -1,0 +1,13 @@
+# Exclude backend and large asset directories from Vercel frontend build
+backend/
+website_photos/
+screenshots/
+*.pdf
+*.py
+*.csv
+*.xlsx
+.vs/
+test.pdf
+test_page_count.pdf
+recapture.js
+capture_planner_1440.js
