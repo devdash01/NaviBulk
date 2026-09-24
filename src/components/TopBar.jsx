@@ -1,6 +1,6 @@
 // SAIL NaviBulk — Decluttered Institutional Top Bar with Sidebar Toggle
 // Clean, calm, 56px header providing operational context without visual crowding
-import React from 'react';
+import React, { useState } from 'react';
 import { useDecisionEngine, STAGE_METADATA } from '../context/DecisionContext.jsx';
 import { 
   ShieldCheck, 
@@ -10,8 +10,10 @@ import {
   PanelLeftOpen, 
   Home, 
   Compass,
-  ArrowRight
+  ArrowRight,
+  Bell
 } from 'lucide-react';
+import TradeAlertCenter from './TradeAlertCenter.jsx';
 
 export default function TopBar({ 
   activeTab, 
@@ -20,6 +22,7 @@ export default function TopBar({
   onToggleSidebar, 
   onOpenMethodologyModal 
 }) {
+  const [isAlertCenterOpen, setIsAlertCenterOpen] = useState(false);
   const {
     inputs,
     activeStage,
@@ -223,8 +226,61 @@ export default function TopBar({
             </button>
           )}
 
+          {/* Live Maritime Trade Radar & Push Alerts Pill */}
+          <button
+            onClick={() => setIsAlertCenterOpen(true)}
+            title="Open Live Maritime Trade Intelligence Radar & Push Alerts"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, rgba(239, 68, 68, 0.08) 100%)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: '8px',
+              color: '#0F172A',
+              cursor: 'pointer',
+              padding: '0.28rem 0.75rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              transition: 'all 0.15s ease',
+              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#EF4444';
+              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+              e.currentTarget.style.background = 'linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, rgba(239, 68, 68, 0.08) 100%)';
+            }}
+          >
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#EF4444', display: 'inline-block', boxShadow: '0 0 8px #EF4444' }} />
+            <Bell size={13} color="#2563EB" />
+            <span style={{ color: '#0F172A' }}>Live Radar</span>
+            <span
+              style={{
+                background: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '0.62rem',
+                fontWeight: 800,
+                padding: '0.1rem 0.35rem',
+                borderRadius: '9999px'
+              }}
+            >
+              LIVE
+            </span>
+          </button>
+
         </div>
       </div>
+
+      {/* Live Maritime Trade Alert Radar Modal */}
+      <TradeAlertCenter 
+        isOpen={isAlertCenterOpen} 
+        onClose={() => setIsAlertCenterOpen(false)} 
+      />
     </header>
   );
 }
+

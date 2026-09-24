@@ -18,12 +18,14 @@ import { EAST_COAST_PORTS, FOREIGN_LOAD_PORTS, VESSEL_CLASSES } from '../data/po
 import { evaluateRouteRisks } from '../engine/riskEngine';
 import { BUNKER_PRICE_VLSFO, NAUTICAL_DISTANCE_MATRIX } from '../data/freightData';
 import RiskRadarMap from './RiskRadarMap';
+import TradeAlertCenter from './TradeAlertCenter';
 
 export default function RiskComplianceView({ initialOrigin = 'Australia', initialDest = 'paradip' }) {
   const [originCountry, setOriginCountry] = useState(initialOrigin);
   const [destinationPortKey, setDestinationPortKey] = useState(initialDest);
   const [vesselClass, setVesselClass] = useState('panamax');
   const [selectedHazardId, setSelectedHazardId] = useState('bay_of_bengal');
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const riskProfile = useMemo(() => {
     return evaluateRouteRisks(originCountry, destinationPortKey);
@@ -61,6 +63,63 @@ export default function RiskComplianceView({ initialOrigin = 'Australia', initia
           Corridor: <strong style={{ color: 'var(--text-hi)' }}>{originCountry} → {destPort.name}</strong> ({distanceNm.toLocaleString()} NM • ~{voyageDays} Days)
         </div>
       </header>
+
+      {/* Live Trade Intelligence & Push Alert Radar Banner */}
+      <div 
+        style={{
+          background: 'linear-gradient(90deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)',
+          border: '1px solid rgba(37, 99, 235, 0.35)',
+          borderRadius: '10px',
+          padding: '0.85rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span 
+            style={{
+              background: '#EF4444',
+              color: '#FFFFFF',
+              fontSize: '0.65rem',
+              fontWeight: 800,
+              padding: '0.2rem 0.55rem',
+              borderRadius: '9999px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              boxShadow: '0 0 10px rgba(239, 68, 68, 0.6)'
+            }}
+          >
+            ● LIVE RADAR (3 ALERTS)
+          </span>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-hi)' }}>
+            <strong>Active Chokepoint Advisory:</strong> UKMTO Red Sea Cape Diversion & IMD Bay of Bengal Swell (Hs 3.8m) Active
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsAlertModalOpen(true)}
+          className="btn-cobalt"
+          style={{
+            padding: '0.35rem 0.85rem',
+            fontSize: '0.76rem',
+            borderRadius: '6px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            cursor: 'pointer'
+          }}
+        >
+          <span>Open Trade Intelligence Radar</span>
+          <span style={{ fontSize: '0.82rem' }}>↗</span>
+        </button>
+      </div>
 
       {/* Dominant Single Score Plaque */}
       <section 
@@ -196,6 +255,12 @@ export default function RiskComplianceView({ initialOrigin = 'Australia', initia
       <footer style={{ fontSize: '0.75rem', color: 'var(--text-low)', borderTop: '1px solid var(--hairline)', paddingTop: '1rem' }}>
         [Illustrative Port Heuristic] Risk weights calibrated against historical Baltic demurrage occurrences. Non-live weather proxy based on seasonal IMD Indian Ocean records.
       </footer>
+
+      {/* Trade Alert Center Modal */}
+      <TradeAlertCenter 
+        isOpen={isAlertModalOpen} 
+        onClose={() => setIsAlertModalOpen(false)} 
+      />
     </div>
   );
 }

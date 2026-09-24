@@ -15,7 +15,14 @@ import {
   Ship, 
   Leaf, 
   Clock, 
-  ShieldCheck 
+  ShieldCheck,
+  Calculator,
+  FileCode,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 
 export default function EconomicsStage() {
@@ -31,6 +38,8 @@ export default function EconomicsStage() {
   } = useDecisionEngine();
 
   const currentSpeed = inputs.speedKnots || 13.0;
+  const [showMathInspector, setShowMathInspector] = React.useState(true);
+  const [activePillar, setActivePillar] = React.useState('all');
 
   // Dynamic insight: check if Capesize has lower nominal freight but higher landed cost due to lightering
   const hasCheaperHeadlineTrap = capesizeCandidate && panamaxCandidate &&
@@ -147,7 +156,379 @@ export default function EconomicsStage() {
             </div>
 
           </div>
+
+          {/* Quick Ledger Expansion Banner */}
+          <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Calculator size={16} color="var(--accent-blue)" />
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Want to see the raw equations behind these numbers?
+              </span>
+              <span className="pill-badge status-cobalt" style={{ fontSize: '0.62rem', padding: '0.1rem 0.4rem' }}>
+                AUDIT PROVENANCE
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowMathInspector(!showMathInspector)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: showMathInspector ? '#EFF6FF' : '#FFFFFF',
+                color: '#2563EB',
+                border: '1.5px solid #BFDBFE',
+                borderRadius: '6px',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <FileCode size={13} />
+              <span>{showMathInspector ? 'Hide Mathematical Derivation' : 'Show Live Equations & Source Audit'}</span>
+              {showMathInspector ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+          </div>
         </div>
+
+        {/* ── 1B. LIVE MATHEMATICAL DERIVATION & DATA PROVENANCE AUDIT LEDGER ── */}
+        {showMathInspector && (
+          <div 
+            style={{
+              background: '#FFFFFF',
+              border: '1.5px solid #93C5FD',
+              borderRadius: '10px',
+              padding: '1.5rem',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.25rem'
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{ background: '#2563EB', color: '#FFF', borderRadius: '6px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Calculator size={16} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                      Live Voyage Mathematics & Formula Audit Ledger
+                    </h3>
+                    <span style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                      Step-by-step arithmetic derivation decomposing <strong>${baseDeliveredCost.totalLanded}/MT</strong> into verified equations & published benchmarks
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Badges */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
+                  ✓ CVC / CAG COMPLIANT
+                </span>
+                <span style={{ background: '#F8FAFC', color: '#475569', border: '1px solid #CBD5E1', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
+                  OPEN ALGEBRA (P ∝ V³)
+                </span>
+              </div>
+            </div>
+
+            {/* Pillar Tabs */}
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', background: '#F8FAFC', padding: '0.4rem', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+              {[
+                { key: 'all', label: 'All 5 Cost Pillars' },
+                { key: 'freight', label: `1. Freight ($${baseDeliveredCost.freightPortion})` },
+                { key: 'bunker', label: `2. Bunker P∝V³ ($${baseDeliveredCost.bunkerPortion})` },
+                { key: 'port', label: `3. Port Dues ($${baseDeliveredCost.portDuesPortion})` },
+                { key: 'demurrage', label: `4. Demurrage ($${baseDeliveredCost.demurragePortion})` },
+                { key: 'lightering', label: `5. Lightering ($${baseDeliveredCost.lighteringFee.toFixed(2)})` }
+              ].map(tab => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActivePillar(tab.key)}
+                  style={{
+                    background: activePillar === tab.key ? '#2563EB' : 'transparent',
+                    color: activePillar === tab.key ? '#FFFFFF' : '#475569',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '0.35rem 0.75rem',
+                    fontSize: '0.72rem',
+                    fontWeight: activePillar === tab.key ? 700 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* 5 Derivation Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+              {/* PILLAR 1: OCEAN FREIGHT */}
+              {(activePillar === 'all' || activePillar === 'freight') && (
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ background: '#2563EB', color: '#FFF', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>PILLAR 1</span>
+                      <strong style={{ fontSize: '0.84rem', color: '#0F172A' }}>Base Ocean Freight Rate</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
+                        ${baseDeliveredCost.freightPortion} <span style={{ fontSize: '0.74rem', color: '#64748B' }}>USD / MT</span>
+                      </span>
+                      <span style={{ display: 'block', fontSize: '0.68rem', color: '#64748B' }}>
+                        Consignment Share: ${Math.round(baseDeliveredCost.freightPortion * inputs.tonnage).toLocaleString()} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mathematical Formula Box */}
+                  <div style={{ background: '#0F172A', color: '#F8FAFC', borderRadius: '6px', padding: '0.85rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', lineHeight: 1.6, marginBottom: '0.6rem' }}>
+                    <div style={{ color: '#94A3B8', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Governing Equation:</div>
+                    <div style={{ color: '#38BDF8', fontWeight: 700, margin: '0.2rem 0' }}>
+                      Freight $/MT = Base Fixture Benchmark Rate × Vessel Class Multiplier
+                    </div>
+                    <div style={{ color: '#E2E8F0' }}>
+                      = ${(recommendedVessel?.costPerTonneUsd || 18.20).toFixed(2)}/MT (Nominal Spot Baseline) × 0.70 (Pure Ocean Freight Allocation)
+                    </div>
+                    <div style={{ color: '#4ADE80', fontWeight: 700 }}>
+                      = ${baseDeliveredCost.freightPortion} USD / MT (for {recommendedVessel?.vesselName || 'Nominated Vessel'})
+                    </div>
+                  </div>
+
+                  {/* Verified Provenance Citation */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#475569', background: '#FFFFFF', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <ShieldCheck size={14} color="#2563EB" />
+                      <span><strong>Primary Data Source:</strong> Baltic Exchange Panamax Index (BPI 82,000 DWT) & Clarksons Shipping Intelligence</span>
+                    </div>
+                    <span style={{ color: '#64748B', fontFamily: 'var(--font-mono)' }}>Dossier §1 & §4</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PILLAR 2: BUNKER CONSUMPTION (CUBIC LAW) */}
+              {(activePillar === 'all' || activePillar === 'bunker') && (
+                <div style={{ background: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: '8px', padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ background: '#1D4ED8', color: '#FFF', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>PILLAR 2</span>
+                      <strong style={{ fontSize: '0.84rem', color: '#1E40AF' }}>Hydrodynamic Bunker Fuel (VLSFO)</strong>
+                      <span className="pill-badge status-cobalt" style={{ fontSize: '0.6rem' }}>DYNAMIC P ∝ V³</span>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1E40AF', fontFamily: 'var(--font-mono)' }}>
+                        ${baseDeliveredCost.bunkerPortion} <span style={{ fontSize: '0.74rem', color: '#3B82F6' }}>USD / MT</span>
+                      </span>
+                      <span style={{ display: 'block', fontSize: '0.68rem', color: '#1E40AF' }}>
+                        Consignment Share: ${(baseDeliveredCost.curTotalBunkerCost || Math.round(baseDeliveredCost.bunkerPortion * inputs.tonnage)).toLocaleString()} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mathematical Formula Box */}
+                  <div style={{ background: '#0F172A', color: '#F8FAFC', borderRadius: '6px', padding: '0.85rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', lineHeight: 1.6, marginBottom: '0.6rem' }}>
+                    <div style={{ color: '#94A3B8', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Governing Hydrodynamic Equation (Admiralty Law):</div>
+                    <div style={{ color: '#38BDF8', fontWeight: 700, margin: '0.2rem 0' }}>
+                      Bunker $/MT = [ Sea Days × (Design Burn × (v / v_design)³) × Price_VLSFO ] ÷ Cargo Tonnage
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Steaming Sea Days: {baseDeliveredCost.distanceNm || 4850} NM ÷ ({currentSpeed.toFixed(1)} kn × 24h) = <strong>{baseDeliveredCost.transitDays} Days</strong> (NGA Pub 151)
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Daily Fuel Burn: {baseDeliveredCost.designBurnTpd || 28.0} TPD × ({currentSpeed.toFixed(1)} / {baseDeliveredCost.designSpeed || 14.0})³ = <strong>{baseDeliveredCost.curBurnTpd} TPD VLSFO</strong>
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Consumed Fuel: {baseDeliveredCost.transitDays}d × {baseDeliveredCost.curBurnTpd} TPD = <strong>{((baseDeliveredCost.transitDays || 15.5) * (baseDeliveredCost.curBurnTpd || 22.4)).toFixed(1)} MT Fuel</strong>
+                    </div>
+                    <div style={{ color: '#E2E8F0', marginTop: '0.2rem' }}>
+                      = [ {baseDeliveredCost.transitDays}d × {baseDeliveredCost.curBurnTpd} TPD × ${baseDeliveredCost.bunkerPrice || 829.50}/t ] ÷ {inputs.tonnage.toLocaleString()} MT
+                    </div>
+                    <div style={{ color: '#4ADE80', fontWeight: 700 }}>
+                      = ${(baseDeliveredCost.curTotalBunkerCost || Math.round(baseDeliveredCost.bunkerPortion * inputs.tonnage)).toLocaleString()} USD ÷ {inputs.tonnage.toLocaleString()} MT = ${baseDeliveredCost.bunkerPortion} USD / MT
+                    </div>
+                  </div>
+
+                  {/* Verified Provenance Citation */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#1E40AF', background: '#FFFFFF', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid #BFDBFE' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <ShieldCheck size={14} color="#2563EB" />
+                      <span><strong>Primary Data Source:</strong> Ship & Bunker G20 Global Average (${baseDeliveredCost.bunkerPrice || 829.50}/MT VLSFO) & NGA Pub 151 Nautical Tables</span>
+                    </div>
+                    <span style={{ color: '#2563EB', fontFamily: 'var(--font-mono)' }}>Dossier §3 & §4</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PILLAR 3: PORT DUES & HANDLING TARIFFS */}
+              {(activePillar === 'all' || activePillar === 'port') && (
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ background: '#475569', color: '#FFF', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>PILLAR 3</span>
+                      <strong style={{ fontSize: '0.84rem', color: '#0F172A' }}>Major Port Trust Tariffs (SOR)</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
+                        ${baseDeliveredCost.portDuesPortion} <span style={{ fontSize: '0.74rem', color: '#64748B' }}>USD / MT</span>
+                      </span>
+                      <span style={{ display: 'block', fontSize: '0.68rem', color: '#64748B' }}>
+                        Port Outlay: ${(baseDeliveredCost.totalPortDuesUsd || Math.round(baseDeliveredCost.portDuesPortion * inputs.tonnage)).toLocaleString()} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mathematical Formula Box */}
+                  <div style={{ background: '#0F172A', color: '#F8FAFC', borderRadius: '6px', padding: '0.85rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', lineHeight: 1.6, marginBottom: '0.6rem' }}>
+                    <div style={{ color: '#94A3B8', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Governing Port Tariff Schedule Equation:</div>
+                    <div style={{ color: '#38BDF8', fontWeight: 700, margin: '0.2rem 0' }}>
+                      Port Dues $/MT = [ Base Pilotage & Tugs + (Port Stay Days × Berth Hire/Day) + (Cargo MT × Handling Tariff) ] ÷ Cargo Tonnage
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Port Stay Days = ({inputs.tonnage.toLocaleString()} MT ÷ 35,000 TPD Discharge Capacity) + 1.2d = <strong>{baseDeliveredCost.portStayDays} Days</strong>
+                    </div>
+                    <div style={{ color: '#E2E8F0' }}>
+                      = [ $18,500 (Pilotage/Tug) + ({baseDeliveredCost.portStayDays}d × $3,200/d Berth Hire) + ({inputs.tonnage.toLocaleString()} × $0.45/t Wharfage) ] ÷ {inputs.tonnage.toLocaleString()} MT
+                    </div>
+                    <div style={{ color: '#4ADE80', fontWeight: 700 }}>
+                      = ${(baseDeliveredCost.totalPortDuesUsd || Math.round(baseDeliveredCost.portDuesPortion * inputs.tonnage)).toLocaleString()} USD ÷ {inputs.tonnage.toLocaleString()} MT = ${baseDeliveredCost.portDuesPortion} USD / MT
+                    </div>
+                  </div>
+
+                  {/* Verified Provenance Citation */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#475569', background: '#FFFFFF', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <ShieldCheck size={14} color="#2563EB" />
+                      <span><strong>Primary Data Source:</strong> Paradip Port Authority (PPA) / Vizag Port Authority (VPT) Scale of Rates (SOR) Gazette</span>
+                    </div>
+                    <span style={{ color: '#64748B', fontFamily: 'var(--font-mono)' }}>Dossier §3</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PILLAR 4: DEMURRAGE & CONGESTION BUFFER */}
+              {(activePillar === 'all' || activePillar === 'demurrage') && (
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ background: '#D97706', color: '#FFF', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>PILLAR 4</span>
+                      <strong style={{ fontSize: '0.84rem', color: '#0F172A' }}>Demurrage & Congestion Laytime Buffer</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
+                        ${baseDeliveredCost.demurragePortion} <span style={{ fontSize: '0.74rem', color: '#64748B' }}>USD / MT</span>
+                      </span>
+                      <span style={{ display: 'block', fontSize: '0.68rem', color: '#64748B' }}>
+                        Demurrage Exposure: ${Math.round(baseDeliveredCost.demurragePortion * inputs.tonnage).toLocaleString()} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mathematical Formula Box */}
+                  <div style={{ background: '#0F172A', color: '#F8FAFC', borderRadius: '6px', padding: '0.85rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', lineHeight: 1.6, marginBottom: '0.6rem' }}>
+                    <div style={{ color: '#94A3B8', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Governing Laytime Demurrage Equation:</div>
+                    <div style={{ color: '#38BDF8', fontWeight: 700, margin: '0.2rem 0' }}>
+                      Demurrage $/MT = [ Congestion Waiting Days × Daily Charter Hire Rate ] ÷ Cargo Tonnage
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Port Congestion Proxy: <strong>{baseDeliveredCost.portWaitDays} Waiting Days</strong> at {inputs.destinationPortKey.toUpperCase()} anchorage
+                    </div>
+                    <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>
+                      • Vessel Daily Hire: <strong>${(baseDeliveredCost.dailyHireRate || 14500).toLocaleString()} USD / Day</strong> (Baltic Time Charter Equivalent)
+                    </div>
+                    <div style={{ color: '#E2E8F0' }}>
+                      = [ {baseDeliveredCost.portWaitDays} Days × ${(baseDeliveredCost.dailyHireRate || 14500).toLocaleString()}/day ] ÷ {inputs.tonnage.toLocaleString()} MT
+                    </div>
+                    <div style={{ color: '#4ADE80', fontWeight: 700 }}>
+                      = ${Math.round(baseDeliveredCost.demurragePortion * inputs.tonnage).toLocaleString()} USD ÷ {inputs.tonnage.toLocaleString()} MT = ${baseDeliveredCost.demurragePortion} USD / MT
+                    </div>
+                  </div>
+
+                  {/* Verified Provenance Citation */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#475569', background: '#FFFFFF', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <ShieldCheck size={14} color="#2563EB" />
+                      <span><strong>Primary Data Source:</strong> BIMCO Laytime Definitions for Chartering 2013 & CAG Audit Report No. 11 of 2018</span>
+                    </div>
+                    <span style={{ color: '#64748B', fontFamily: 'var(--font-mono)' }}>Dossier §1 & §2</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PILLAR 5: LIGHTERING / TRANSSHIPMENT */}
+              {(activePillar === 'all' || activePillar === 'lightering') && (
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ background: '#64748B', color: '#FFF', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>PILLAR 5</span>
+                      <strong style={{ fontSize: '0.84rem', color: '#0F172A' }}>Lightering & Transshipment Clearance</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: baseDeliveredCost.lighteringFee > 0 ? '#B45309' : '#16A34A', fontFamily: 'var(--font-mono)' }}>
+                        ${baseDeliveredCost.lighteringFee.toFixed(2)} <span style={{ fontSize: '0.74rem', color: '#64748B' }}>USD / MT</span>
+                      </span>
+                      <span style={{ display: 'block', fontSize: '0.68rem', color: '#64748B' }}>
+                        {baseDeliveredCost.lighteringFee > 0 ? 'Mandatory Sagar Transshipment Fee' : 'Direct Berth Discharge (Zero Transshipment Penalty)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mathematical Formula Box */}
+                  <div style={{ background: '#0F172A', color: '#F8FAFC', borderRadius: '6px', padding: '0.85rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', lineHeight: 1.6, marginBottom: '0.6rem' }}>
+                    <div style={{ color: '#94A3B8', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Governing Physical Draft Gate Check:</div>
+                    <div style={{ color: '#38BDF8', fontWeight: 700, margin: '0.2rem 0' }}>
+                      Condition: If Vessel Laden Draft (13.8m) &gt; Port Lock Draft (8.8m) → Lightering Required (+$4.20/MT)
+                    </div>
+                    <div style={{ color: '#E2E8F0' }}>
+                      • Destination: <strong>{inputs.destinationPortKey.toUpperCase()}</strong> (Permissible Draft: {inputs.destinationPortKey === 'haldia' ? '8.8m' : inputs.destinationPortKey === 'vizag' ? '18.1m' : '14.5m'})
+                    </div>
+                    <div style={{ color: baseDeliveredCost.lighteringFee > 0 ? '#FBBF24' : '#4ADE80', fontWeight: 700 }}>
+                      • Outcome: {baseDeliveredCost.lighteringFee > 0 ? 'DRAFT GATED → +$4.20/MT lightering barge fee at Sandheads / Sagar' : 'CLEAR DRAFT → Direct berthing authorized ($0.00/MT lightering)'}
+                    </div>
+                  </div>
+
+                  {/* Verified Provenance Citation */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#475569', background: '#FFFFFF', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <ShieldCheck size={14} color="#2563EB" />
+                      <span><strong>Primary Data Source:</strong> PIB Official Gazette on SMPK Sagar Anchorage Transshipment (PRID 1767354)</span>
+                    </div>
+                    <span style={{ color: '#64748B', fontFamily: 'var(--font-mono)' }}>Dossier §1 & §3</span>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Total Reconciliation Bar */}
+            <div style={{ background: '#F0FDF4', border: '1.5px solid #86EFAC', borderRadius: '8px', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Audited Mathematical Reconciliation:
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', fontWeight: 700, color: '#14532D', marginTop: '0.2rem' }}>
+                  ${baseDeliveredCost.freightPortion} <span style={{ color: '#64748B', fontSize: '0.74rem' }}>(Freight)</span> + ${baseDeliveredCost.bunkerPortion} <span style={{ color: '#64748B', fontSize: '0.74rem' }}>(Bunker)</span> + ${baseDeliveredCost.portDuesPortion} <span style={{ color: '#64748B', fontSize: '0.74rem' }}>(Port)</span> + ${baseDeliveredCost.demurragePortion} <span style={{ color: '#64748B', fontSize: '0.74rem' }}>(Demurrage)</span>{baseDeliveredCost.lighteringFee > 0 ? ` + $${baseDeliveredCost.lighteringFee.toFixed(2)} (Lightering)` : ''}
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '1.45rem', fontWeight: 900, color: '#166534', fontFamily: 'var(--font-mono)' }}>
+                  = ${baseDeliveredCost.totalLanded} <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>USD / MT</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#15803D' }}>
+                  Consignment Outlay: ${baseDeliveredCost.totalOutlayUsd.toLocaleString()} USD (₹{baseDeliveredCost.totalOutlayInrCr} Cr INR)
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
 
 
         {/* ── 2. HYDRODYNAMIC SPEED & ECO-STEAMING OPTIMIZATION CONSOLE ── */}

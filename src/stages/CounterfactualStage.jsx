@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   Play,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  BookOpen
 } from 'lucide-react';
 
 export default function CounterfactualStage() {
@@ -53,7 +54,7 @@ export default function CounterfactualStage() {
       nextActionLabel="Generate Decision Brief"
       onNextAction={() => advanceStage('counterfactual')}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         
         {/* ── TOP PROVENANCE ALERT ── */}
         <div className="analytical-card" style={{ borderRadius: '12px', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)' }}>

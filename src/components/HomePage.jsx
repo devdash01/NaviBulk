@@ -32,17 +32,18 @@ import {
   SearchCheck,
   Check,
   Menu,
-  ArrowUpRight
+  ArrowUpRight,
+  Bell
 } from 'lucide-react';
 import { BUNKER_PRICE_VLSFO, COMMODITY_PINK_SHEET, HISTORICAL_SERIES } from '../data/freightData';
 import { EAST_COAST_PORTS, FOREIGN_LOAD_PORTS } from '../data/portConstraints';
 import RouteLine from './RouteLine';
+import TradeAlertCenter from './TradeAlertCenter.jsx';
 
 export default function HomePage({ onNavigate, onConfigureVoyage }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const [plantSelectorOpen, setPlantSelectorOpen] = useState(false);
-  const [selectedPlant, setSelectedPlant] = useState({ name: 'SAIL Corporate HQ', location: 'Lodhi Road, New Delhi' });
+  const [alertCenterOpen, setAlertCenterOpen] = useState(false);
   const [activeCorridorKey, setActiveCorridorKey] = useState('australia_paradip');
   const [trackingModalOpen, setTrackingModalOpen] = useState(false);
   const [trackingId, setTrackingId] = useState('SAIL-BL-2026-0849');
@@ -206,14 +207,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
     return () => clearInterval(interval);
   }, [isAutoCycling, corridors]);
 
-  const sailPlants = [
-    { name: 'SAIL Corporate HQ', location: 'Lodhi Road, New Delhi', desc: 'Central Raw Materials Directorate' },
-    { name: 'Bhilai Steel Plant (BSP)', location: 'Durg, Chhattisgarh', desc: '7.0 MTPA Capacity • Sourced via Vizag Quay' },
-    { name: 'Bokaro Steel Plant (BSL)', location: 'Bokaro, Jharkhand', desc: '4.6 MTPA Capacity • Sourced via Paradip & Dhamra' },
-    { name: 'Rourkela Steel Plant (RSP)', location: 'Sundargarh, Odisha', desc: '4.5 MTPA Capacity • Sourced via Paradip Berth' },
-    { name: 'Durgapur Steel Plant (DSP)', location: 'Paschim Bardhaman, WB', desc: '2.2 MTPA Capacity • Sourced via Haldia/Dhamra' },
-    { name: 'IISCO Steel Plant (ISP)', location: 'Burnpur, West Bengal', desc: '2.5 MTPA Capacity • Sourced via Dhamra Port' }
-  ];
 
   const handleLaunchPlanner = (corridor = activeCorridor) => {
     if (onConfigureVoyage) {
@@ -371,37 +364,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
           </div>
         </div>
 
-        {/* CENTER: Minimalist Glowing Emblem Logo */}
-        <div 
-          onClick={() => onNavigate('home')}
-          style={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '46px',
-            height: '32px',
-            borderRadius: '9999px',
-            border: '1.5px solid rgba(255, 255, 255, 0.45)',
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(8px)',
-            boxShadow: '0 0 16px rgba(255, 255, 255, 0.2)',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FFFFFF'}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.45)'}
-          title="SAIL NaviBulk Home"
-        >
-          <div 
-            style={{
-              width: '16px',
-              height: '9px',
-              borderRadius: '9999px',
-              border: '2px solid #FFFFFF'
-            }}
-          />
-        </div>
-
         {/* RIGHT: Schedule Transport Button + Flag + Avatar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <button
@@ -433,6 +395,57 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             Schedule Transport
           </button>
 
+          {/* Live Maritime Radar & Push Alerts Button */}
+          <button
+            onClick={() => setAlertCenterOpen(true)}
+            title="Live Maritime Trade Intelligence Radar & Push Alerts"
+            style={{
+              position: 'relative',
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(8px)',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
+              borderRadius: '9999px',
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              padding: '0.62rem 1.15rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              fontSize: '0.84rem',
+              fontWeight: 700,
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+              e.currentTarget.style.borderColor = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)';
+            }}
+          >
+            <Bell size={15} />
+            <span>Radar Alerts</span>
+            <span
+              style={{
+                background: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '0.62rem',
+                fontWeight: 800,
+                padding: '0.12rem 0.45rem',
+                borderRadius: '9999px',
+                boxShadow: '0 0 10px rgba(239, 68, 68, 0.9)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem'
+              }}
+            >
+              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#FFFFFF' }} />
+              LIVE
+            </span>
+          </button>
+
           {/* Country Flag Badge (Indian Flag 🇮🇳) */}
           <div 
             title="India • Ministry of Steel / SAIL"
@@ -456,27 +469,6 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             <div style={{ flex: 1, background: '#128807' }} />
           </div>
 
-          {/* User Avatar */}
-          <div 
-            onClick={() => setPlantSelectorOpen(!plantSelectorOpen)}
-            title="Executive Logistics Desk • Steel Authority of India"
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              border: '2px solid #FFFFFF',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-              cursor: 'pointer',
-              flexShrink: 0
-            }}
-          >
-            <img 
-              src="/navibulk_user_avatar.jpg" 
-              alt="Executive Avatar" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
         </div>
       </header>
 
@@ -580,63 +572,7 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
         </div>
       )}
 
-      {/* ── STEEL PLANT SELECTOR DROPDOWN (WHEN AVATAR CLICKED) ── */}
-      {plantSelectorOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 140,
-            background: 'transparent'
-          }}
-          onClick={() => setPlantSelectorOpen(false)}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              top: '5.2rem',
-              right: '3.5rem',
-              width: '290px',
-              background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: '10px',
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.2)',
-              padding: '0.5rem',
-              zIndex: 145
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ padding: '0.45rem 0.65rem', fontSize: '0.68rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', borderBottom: '1px solid #E2E8F0', marginBottom: '0.25rem' }}>
-              SAIL Steel Plant Directorate
-            </div>
-            {sailPlants.map((p) => (
-              <div 
-                key={p.name}
-                onClick={() => {
-                  setSelectedPlant(p);
-                  setPlantSelectorOpen(false);
-                }}
-                style={{
-                  padding: '0.55rem 0.65rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: selectedPlant.name === p.name ? '#92400E' : '#334155',
-                  background: selectedPlant.name === p.name ? '#FEF3C7' : 'transparent',
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedPlant.name !== p.name) e.currentTarget.style.background = '#F8FAFC';
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedPlant.name !== p.name) e.currentTarget.style.background = 'transparent';
-                }}
-              >
-                <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{p.name}</div>
-                <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '1px' }}>{p.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
 
 
       {/* ── CINEMATIC FULL-SCREEN HERO (MATCHING BEHANCE TRANSOCEAN) ── */}
@@ -811,22 +747,23 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
             gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))'
           }}
         >
-          {/* CARD 1: Cobalt Blue (Left) */}
+          {/* CARD 1: Deep Navy Blue Gradient (Left) */}
           <div 
             onClick={() => handleLaunchPlanner()}
             style={{
-              background: '#1D4ED8',
+              background: 'linear-gradient(135deg, rgba(11, 21, 40, 0.96) 0%, rgba(29, 78, 216, 0.92) 100%)',
+              backdropFilter: 'blur(12px)',
               padding: '1.4rem 2.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRight: '1px solid rgba(255, 255, 255, 0.15)'
+              borderTop: '1px solid rgba(255, 255, 255, 0.18)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.12)'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#1E40AF'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#1D4ED8'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 27, 52, 0.98) 0%, rgba(30, 64, 175, 0.95) 100%)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, rgba(11, 21, 40, 0.96) 0%, rgba(29, 78, 216, 0.92) 100%)'}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               {/* Capsule Image */}
@@ -837,8 +774,8 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                   borderRadius: '9999px',
                   overflow: 'hidden',
                   flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-                  border: '2px solid rgba(255, 255, 255, 0.2)'
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)',
+                  border: '2px solid rgba(255, 255, 255, 0.3)'
                 }}
               >
                 <img 
@@ -858,10 +795,10 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                     fontFamily: "'Plus Jakarta Sans', sans-serif"
                   }}
                 >
-                  Sea & Ocean<br />Dry Bulk Transport.
+                  Sea &amp; Ocean<br />Dry Bulk Transport.
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.75)', marginTop: '0.35rem', fontWeight: 600 }}>
-                  [About our 10-stage decision pipeline]
+                <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.85)', marginTop: '0.35rem', fontWeight: 600 }}>
+                  10-Stage Decision Funnel • Mathematical Sourcing Optimization
                 </div>
               </div>
             </div>
@@ -873,33 +810,35 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 height: '42px',
                 borderRadius: '50%',
                 border: '1.5px solid rgba(255, 255, 255, 0.4)',
-                background: 'rgba(255, 255, 255, 0.12)',
+                background: 'rgba(255, 255, 255, 0.14)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                flexShrink: 0
+                flexShrink: 0,
+                transition: 'all 0.15s ease'
               }}
             >
               <ArrowUpRight size={20} />
             </div>
           </div>
 
-          {/* CARD 2: Crisp White (Right) */}
+          {/* CARD 2: Deep Slate Navy (Right) */}
           <div 
             onClick={() => onNavigate('ports')}
             style={{
-              background: '#FFFFFF',
+              background: 'linear-gradient(135deg, rgba(11, 21, 40, 0.96) 0%, rgba(15, 23, 42, 0.94) 100%)',
+              backdropFilter: 'blur(12px)',
               padding: '1.4rem 2.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              borderTop: '1px solid #E2E8F0'
+              borderTop: '1px solid rgba(255, 255, 255, 0.18)'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#FFFFFF'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 27, 52, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, rgba(11, 21, 40, 0.96) 0%, rgba(15, 23, 42, 0.94) 100%)'}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               {/* Capsule Image */}
@@ -910,8 +849,8 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                   borderRadius: '9999px',
                   overflow: 'hidden',
                   flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
-                  border: '2px solid #E2E8F0'
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)',
+                  border: '2px solid rgba(255, 255, 255, 0.3)'
                 }}
               >
                 <img 
@@ -926,15 +865,15 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                   style={{ 
                     fontSize: '1.24rem', 
                     fontWeight: 800, 
-                    color: '#0F172A', 
+                    color: '#FFFFFF', 
                     lineHeight: 1.2,
                     fontFamily: "'Plus Jakarta Sans', sans-serif"
                   }}
                 >
                   See route schedules<br />and find the fitting one.
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '0.35rem', fontWeight: 600 }}>
-                  [Audited East Coast port terminals]
+                <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.85)', marginTop: '0.35rem', fontWeight: 600 }}>
+                  Audited East Coast Port Terminals • Real-Time Draft Limits
                 </div>
               </div>
             </div>
@@ -945,13 +884,14 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
                 width: '42px',
                 height: '42px',
                 borderRadius: '50%',
-                border: '1.5px solid #CBD5E1',
-                background: '#F8FAFC',
+                border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                background: 'rgba(255, 255, 255, 0.14)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0F172A',
-                flexShrink: 0
+                color: '#FFFFFF',
+                flexShrink: 0,
+                transition: 'all 0.15s ease'
               }}
             >
               <ArrowUpRight size={20} />
@@ -1794,6 +1734,13 @@ export default function HomePage({ onNavigate, onConfigureVoyage }) {
         </div>
       </footer>
 
+      {/* Live Maritime Trade Intelligence Radar & Push Alerts Modal */}
+      <TradeAlertCenter 
+        isOpen={alertCenterOpen} 
+        onClose={() => setAlertCenterOpen(false)} 
+      />
+
     </div>
   );
 }
+

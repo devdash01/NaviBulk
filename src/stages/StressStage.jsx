@@ -15,7 +15,9 @@ import {
   Sparkles,
   ArrowRight,
   TrendingDown,
-  Activity
+  Activity,
+  BookOpen,
+  HelpCircle
 } from 'lucide-react';
 
 export default function StressStage() {
@@ -43,6 +45,8 @@ export default function StressStage() {
   const hedgedTotalOutlayUsd = stressedEconomics.hedgedTotalOutlayUsd;
   const hedgedLandedCost = stressedEconomics.hedgedLanded;
 
+  const [showPrimer, setShowPrimer] = React.useState(true);
+
   const conclusionText = isStressed
     ? `Under active sensitivity stress, delivered cost shifts from $${baseDeliveredCost.totalLanded}/MT to $${stressedEconomics.newLanded}/MT (${costDeltaPerMt >= 0 ? `+$${costDeltaPerMt}` : `-$${Math.abs(costDeltaPerMt)}`}/MT). Without NaviBulk, unhedged spot exposure increases budget by $${Math.abs(grossShockDeltaUsd).toLocaleString()} USD. NaviBulk's adaptive recommendation (${stressedEconomics.stressedRecommendation}) caps exposure, protecting +$${hedgedMitigationSavingsUsd.toLocaleString()} USD (₹${hedgedMitigationInrCr} Cr / -$${hedgedMitigationPerMt}/MT) in total cost optimization.`
     : `Base Plan evaluated at baseline parameters ($${baseDeliveredCost.totalLanded}/MT). Adjust the shock sliders or select a historical crisis preset to evaluate sensitivity against severe freight spikes, demurrage accumulation, and bunker escalation.`;
@@ -54,8 +58,83 @@ export default function StressStage() {
       nextActionLabel="Review Counterfactual Proof"
       onNextAction={() => advanceStage('stress')}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         
+        {/* ── 0. PLAIN-ENGLISH EDUCATIONAL PRIMER (STRESS TESTING 101) ── */}
+        <div 
+          style={{
+            background: '#F0F9FF',
+            border: '1.5px solid #BAE6FD',
+            borderRadius: '10px',
+            padding: '1.25rem 1.5rem',
+            position: 'relative'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', maxWidth: '850px' }}>
+              <div style={{ background: '#0284C7', color: '#FFF', borderRadius: '8px', padding: '0.45rem', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '0.1rem' }}>
+                <BookOpen size={18} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#0369A1', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    PLAIN-ENGLISH PRIMER • THE MARITIME "CRASH TEST SIMULATOR"
+                  </span>
+                  <span style={{ background: '#E0F2FE', color: '#0284C7', fontSize: '0.62rem', fontWeight: 700, padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                    WHAT THIS PAGE DOES
+                  </span>
+                </div>
+                <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#0C4A6E', margin: 0 }}>
+                  What happens to your ₹10–15 Cr consignment if a cyclone strikes or freight spikes?
+                </h3>
+                <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#0369A1', lineHeight: 1.55 }}>
+                  In bulk shipping, a 5-day port shutdown or sudden fuel surge can add <strong>₹2 to ₹4 Crore</strong> in avoidable demurrage penalties ($20,000/day idle waiting fee). <strong>Stage 08 simulates these real-world disruptions</strong> to test whether your voyage plan can survive market shocks, and shows how NaviBulk's hedges (COA coverage & Virtual Arrival speed adjustment) protect your capital.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowPrimer(!showPrimer)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #7DD3FC',
+                color: '#0284C7',
+                borderRadius: '6px',
+                padding: '0.25rem 0.6rem',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              {showPrimer ? 'Hide Guide' : 'Show Guide'}
+            </button>
+          </div>
+
+          {showPrimer && (
+            <div style={{ marginTop: '1rem', paddingTop: '0.85rem', borderTop: '1px dashed #BAE6FD', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.85rem' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.75rem 0.85rem', borderRadius: '6px', border: '1px solid #E0F2FE' }}>
+                <strong style={{ display: 'block', fontSize: '0.74rem', color: '#0369A1' }}>1. Pick a Crisis Preset</strong>
+                <span style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.45 }}>
+                  Click one of the 4 historical crisis buttons below (e.g. <em>2021 Squeeze</em> or <em>Cyclone Yasi</em>) or drag the sliders.
+                </span>
+              </div>
+              <div style={{ background: '#FFFFFF', padding: '0.75rem 0.85rem', borderRadius: '6px', border: '1px solid #E0F2FE' }}>
+                <strong style={{ display: 'block', fontSize: '0.74rem', color: '#0369A1' }}>2. Compare the 3 Outcomes</strong>
+                <span style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.45 }}>
+                  Watch how your <strong>Planned Cost</strong> differs from the <strong>Disaster Spot Shock</strong> vs <strong>NaviBulk Protected Cap</strong>.
+                </span>
+              </div>
+              <div style={{ background: '#FFFFFF', padding: '0.75rem 0.85rem', borderRadius: '6px', border: '1px solid #E0F2FE' }}>
+                <strong style={{ display: 'block', fontSize: '0.74rem', color: '#0369A1' }}>3. Deploy the Countermeasure</strong>
+                <span style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.45 }}>
+                  Read NaviBulk's operational recommendation (e.g. slow steaming to arrive when the berth opens, saving $14k/day).
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ── 1. TOTAL COST OPTIMIZATION & HEDGING DIFFERENCE BANNER ── */}
         {isStressed && grossShockDeltaUsd > 0 && (
           <div 

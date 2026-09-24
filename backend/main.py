@@ -786,6 +786,26 @@ def get_live_marine_weather(lat: float = 20.26, lon: float = 86.67, port_name: s
             "note": str(e)
         }
 
+
+# ============================================================
+# Live Maritime Trade Intelligence & Push Alert Stream
+# ============================================================
+@app.get("/api/alerts/live")
+def get_live_alerts():
+    """
+    Live Trade Intelligence Radar:
+    Returns live oceanographic wave telemetry for East Coast ports (Open-Meteo)
+    and real-time global maritime news (gCaptain & Hellenic) with quantified decision impacts.
+    """
+    try:
+        from services.live_alerts import get_live_trade_alerts_payload
+        return get_live_trade_alerts_payload()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Live Alert Error: {str(e)}")
+
+
 # ============================================================
 # V2 Decision Intelligence API Endpoint
 # ============================================================

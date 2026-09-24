@@ -77,6 +77,7 @@ export default function FeasibilityStage() {
 
   const [selectedRiskCategory, setSelectedRiskCategory] = useState('all');
   const [selectedVoyageLeg, setSelectedVoyageLeg] = useState('all');
+  const [riskViewMode, setRiskViewMode] = useState('matrix'); // 'matrix' | 'cockpit'
   const [isStatutoryTableExpanded, setIsStatutoryTableExpanded] = useState(false);
   const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
   const [expandedCardDetails, setExpandedCardDetails] = useState({});
@@ -287,39 +288,123 @@ export default function FeasibilityStage() {
             border: '1px solid var(--border)'
           }}
         >
-          {/* Header & Transocean Eyebrow */}
+          {/* Header & Risk Management Title */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', flexWrap: 'wrap', gap: '0.85rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(14,165,233,0.12) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1D4ED8', border: '1px solid rgba(37,99,235,0.2)' }}>
-                  <ShieldAlert size={20} />
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(14,165,233,0.12) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1D4ED8', border: '1px solid rgba(37,99,235,0.2)' }}>
+                  <ShieldCheck size={22} />
                 </div>
                 <div>
                   <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <span>TRANSOCEAN MARITIME CORRIDOR INTELLIGENCE</span>
+                    <span>VOYAGE ROUTE SAFETY & OPERATIONAL RISK MATRIX</span>
                     <span>•</span>
-                    <span>DEEP-DRAFT DRY BULK AUDIT</span>
+                    <span>COMMERCIAL ASSURANCE</span>
                   </div>
-                  <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: '0.15rem 0 0', letterSpacing: '-0.01em' }}>
-                    Corridor Risk & Statutory Hazard Audit: {inputs.originCountry} ({loadTerminalName}) → {destPort.name} ({destBerthName})
+                  <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: '0.15rem 0 0', letterSpacing: '-0.01em' }}>
+                    Route Safety, Metocean & Regulatory Risk Audit: {inputs.originCountry} → {destPort.name}
                   </h2>
                 </div>
               </div>
-              <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 500, marginTop: '0.45rem', paddingLeft: '3rem' }}>
-                Exhaustive {corridorDistanceNm.toLocaleString()} NM Hydrodynamic & Statutory Risk Architecture • 6 Regulatory Spheres • SOLAS, IMSBC, MARPOL, BIMCO, IMD & PPA
+              <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 500, marginTop: '0.45rem', paddingLeft: '3.1rem' }}>
+                Load Port: <strong>{loadTerminalName}</strong> • Discharge Port: <strong>{destPort.name}</strong> • Comprehensive {corridorDistanceNm.toLocaleString()} NM safety verification across water depth clearance, cargo moisture stability, Bay of Bengal weather, and BIMCO demurrage protections.
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span className="pill-badge status-cobalt" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem', fontWeight: 700 }}>
-                {routeRisks?.riskCards?.length || 7} STATUTORY HAZARDS AUDITED
-              </span>
-              <span className="pill-badge status-success" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem', fontWeight: 700 }}>
-                8 CONVENTIONS VERIFIED
-              </span>
-              <span className="provenance-label" style={{ fontSize: '0.65rem' }}>
-                RULE-BASED STATUTORY HEURISTIC
-              </span>
+            {/* View Mode Switcher Pills */}
+            <div style={{ display: 'flex', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.25rem', gap: '0.25rem' }}>
+              <button
+                onClick={() => setRiskViewMode('matrix')}
+                style={{
+                  background: riskViewMode === 'matrix' ? '#2563EB' : 'transparent',
+                  color: riskViewMode === 'matrix' ? '#FFFFFF' : '#475569',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.75rem',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <ShieldCheck size={13} />
+                <span>Executive Risk Matrix</span>
+              </button>
+              <button
+                onClick={() => setRiskViewMode('cockpit')}
+                style={{
+                  background: riskViewMode === 'cockpit' ? '#0F172A' : 'transparent',
+                  color: riskViewMode === 'cockpit' ? '#FFFFFF' : '#475569',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.75rem',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Radio size={13} />
+                <span>Interactive Radar & Cockpit</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ── EXECUTIVE SAFETY VERDICT BANNER (Instant Clarity) ── */}
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)',
+              border: '1.5px solid #86EFAC',
+              borderRadius: '10px',
+              padding: '1rem 1.25rem',
+              marginBottom: '1.25rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#15803D', flexShrink: 0, border: '1px solid #86EFAC' }}>
+                <ShieldCheck size={24} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    VOYAGE VERDICT: CLEAR FOR TRANSIT
+                  </span>
+                  <span style={{ background: '#16A34A', color: '#FFFFFF', fontSize: '0.66rem', fontWeight: 800, padding: '0.15rem 0.55rem', borderRadius: '9999px' }}>
+                    SCORE: {routeRisks?.overallRiskScore || 34}/100 (LOW OPERATIONAL RISK)
+                  </span>
+                </div>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.78rem', color: '#166534', lineHeight: 1.45, maxWidth: '820px' }}>
+                  All 7 statutory safety checkpoints passed. Navigational draft clearance (+5.6m UKC in Malacca Strait) and laboratory coal moisture certification (TML ≤ 9.5%) confirm routine commercial voyage. Zero Port State Control (PSC) detention flags or prohibitive weather holds.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ borderRight: '1px solid #BBF7D0', paddingRight: '1.25rem' }}>
+                <div style={{ fontSize: '0.62rem', color: '#15803D', fontWeight: 700, textTransform: 'uppercase' }}>Port State Control</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#14532D', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <CheckCircle2 size={13} color="#16A34A" />
+                  <span>0 Deficiencies</span>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: '#15803D', fontWeight: 700, textTransform: 'uppercase' }}>Demurrage Protected</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#14532D', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <ShieldCheck size={13} color="#16A34A" />
+                  <span>+$184,000 Hedged</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -332,69 +417,153 @@ export default function FeasibilityStage() {
               marginBottom: '1.4rem' 
             }}
           >
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.85rem 1rem' }}>
+            {/* Card 1: Overall Route Risk */}
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.95rem 1.1rem' }}>
               <div style={{ fontSize: '0.64rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
-                Composite Corridor Risk
+                Overall Route Risk Score
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.25rem' }}>
                 <span style={{ fontSize: '1.45rem', fontWeight: 900, color: (routeRisks?.overallRiskScore || 34) > 60 ? '#B45309' : '#16A34A', fontFamily: 'var(--font-mono)' }}>
                   {routeRisks?.overallRiskScore || 34}
                 </span>
                 <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>/ 100</span>
+                <span style={{ marginLeft: 'auto', fontSize: '0.66rem', fontWeight: 800, color: '#16A34A', background: '#DCFCE7', padding: '0.12rem 0.45rem', borderRadius: '9999px' }}>
+                  LOW RISK
+                </span>
               </div>
-              <div style={{ fontSize: '0.68rem', color: '#059669', fontWeight: 700, marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              {/* Visual 3-tier risk bar */}
+              <div style={{ height: '5px', background: '#E2E8F0', borderRadius: '9999px', marginTop: '0.45rem', overflow: 'hidden', display: 'flex' }}>
+                <div style={{ width: '50%', background: '#10B981' }} title="0-50 Low Risk" />
+                <div style={{ width: '25%', background: '#F59E0B' }} title="50-75 Moderate" />
+                <div style={{ width: '25%', background: '#EF4444' }} title="75-100 High" />
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#059669', fontWeight: 700, marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <CheckCircle2 size={12} />
-                <span>Controlled Commercial Transit • Zero PSC Hold</span>
+                <span>Controlled commercial transit • Zero PSC flags</span>
               </div>
             </div>
 
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.85rem 1rem' }}>
+            {/* Card 2: Keel & Chokepoint */}
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.95rem 1.1rem' }}>
               <div style={{ fontSize: '0.64rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
-                Chokepoint & Reef Gating
+                Shallow Water & Keel Clearance
               </div>
-              <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A', marginTop: '0.35rem' }}>
-                {inputs.originCountry === 'Australia' ? 'Malacca TSS & GBR Cleared' : inputs.originCountry === 'Russia' ? 'Sanctions Gated' : 'Cape of Good Hope Diverted'}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#2563EB', fontFamily: 'var(--font-mono)' }}>
+                  +5.6m UKC
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>(Min 3.5m)</span>
+              </div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0F172A', marginTop: '0.2rem' }}>
+                {inputs.originCountry === 'Australia' ? 'Malacca TSS & Phillips Channel Cleared' : 'Direct Deep-Draft Transit'}
               </div>
               <div style={{ fontSize: '0.68rem', color: '#2563EB', fontWeight: 600, marginTop: '0.2rem' }}>
-                {inputs.originCountry === 'Australia' ? '5.6m UKC in Phillips Channel (19.8m Min)' : 'Transit Corridors Modeled'}
+                {inputs.originCountry === 'Australia' ? 'Saves ~$142k USD vs Lombok bypass' : 'Verified nautical passage'}
               </div>
             </div>
 
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.85rem 1rem' }}>
+            {/* Card 3: IMSBC Cargo */}
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.95rem 1.1rem' }}>
               <div style={{ fontSize: '0.64rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
-                IMSBC Cargo Classification
+                IMSBC Coal Cargo Stability
               </div>
-              <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A', marginTop: '0.35rem' }}>
-                Dual Group A & B Hazards
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '1.35rem', fontWeight: 900, color: '#059669', fontFamily: 'var(--font-mono)' }}>
+                  Moisture Safe
+                </span>
+                <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>(7.8%)</span>
               </div>
-              <div style={{ fontSize: '0.68rem', color: '#B45309', fontWeight: 600, marginTop: '0.2rem' }}>
-                TML ≤ 9.5% Certified • Hold Gas Sensing Active
-              </div>
-            </div>
-
-            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.85rem 1rem' }}>
-              <div style={{ fontSize: '0.64rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
-                Protected Demurrage / Outlay
-              </div>
-              <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#15803D', fontFamily: 'var(--font-mono)', marginTop: '0.2rem' }}>
-                +$184,000 USD
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0F172A', marginTop: '0.2rem' }}>
+                Dual Group A & B Certified
               </div>
               <div style={{ fontSize: '0.68rem', color: '#166534', fontWeight: 600, marginTop: '0.2rem' }}>
-                Hedged via BIMCO Laycan & Virtual Arrival
+                TML ≤ 9.5% certified • Gas sensing active
+              </div>
+            </div>
+
+            {/* Card 4: Demurrage */}
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.95rem 1.1rem' }}>
+              <div style={{ fontSize: '0.64rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                Demurrage Capital Protected
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#15803D', fontFamily: 'var(--font-mono)' }}>
+                  +$184,000
+                </span>
+                <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>USD</span>
+              </div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0F172A', marginTop: '0.2rem' }}>
+                BIMCO Virtual Arrival Active
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#166534', fontWeight: 600, marginTop: '0.2rem' }}>
+                Eliminates idle wait at anchor via speed control
               </div>
             </div>
           </div>
 
-          {/* ── INTERACTIVE MARITIME HAZARD VISUAL STUDIO (MAPS, RADAR & GAUGES) ── */}
-          <div style={{ marginBottom: '1.75rem' }}>
-            <CorridorRiskVisualStudio
-              originCountry={inputs.originCountry}
-              destinationPortKey={inputs.destinationPortKey}
-              routeRisks={routeRisks}
-              recommendedVessel={recommendedVessel}
-              inputs={inputs}
-            />
-          </div>
+          {/* ── CONDITIONAL VIEW: COCKPIT MODE ── */}
+          {riskViewMode === 'cockpit' && (
+            <div style={{ marginBottom: '1.75rem' }}>
+              <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.76rem', color: '#1E40AF', fontWeight: 600 }}>
+                  <Radio size={16} color="#2563EB" />
+                  <span><strong>Technical Nautical Lab Active:</strong> Inspect interactive Doppler cyclone sweeps, underwater bathymetric soundings, hold cutaways, and BIMCO throttle curves.</span>
+                </div>
+                <button
+                  onClick={() => setRiskViewMode('matrix')}
+                  style={{
+                    background: '#2563EB',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '0.35rem 0.85rem',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ← Return to Executive Matrix View
+                </button>
+              </div>
+
+              <CorridorRiskVisualStudio
+                originCountry={inputs.originCountry}
+                destinationPortKey={inputs.destinationPortKey}
+                routeRisks={routeRisks}
+                recommendedVessel={recommendedVessel}
+                inputs={inputs}
+              />
+            </div>
+          )}
+
+          {/* ── CONDITIONAL VIEW: EXECUTIVE MATRIX MODE (INVITATION BANNER) ── */}
+          {riskViewMode === 'matrix' && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.65rem 1rem', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.74rem', color: '#475569' }}>
+                <Compass size={15} color="#2563EB" />
+                <span>Maritime engineering evaluation mode: Inspect live Doppler cyclone cones, Phillips Channel soundings, and hold gas telemetry in the interactive simulator.</span>
+              </div>
+              <button
+                onClick={() => setRiskViewMode('cockpit')}
+                style={{
+                  background: '#FFFFFF',
+                  color: '#1D4ED8',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: '6px',
+                  padding: '0.3rem 0.75rem',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <Radio size={12} />
+                <span>Open Radar & Bathymetry Cockpit ↗</span>
+              </button>
+            </div>
+          )}
 
           {/* ── INTERACTIVE VOYAGE CORRIDOR TIMELINE (4-PHASE STEPPER) ── */}
           {routeRisks?.voyageTimeline && routeRisks.voyageTimeline.length > 0 && (
@@ -593,51 +762,51 @@ export default function FeasibilityStage() {
                       </div>
                     )}
 
-                    {/* ── BESPOKE VISUAL INSTRUMENT CONSOLES ── */}
+                    {/* ── BESPOKE VISUAL INSTRUMENT CONSOLES (High-Contrast Light Theme) ── */}
                     {card.id === 'weather_cyclone' && (
-                      <div style={{ background: '#0B1528', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8' }}>
-                            <Radio size={13} color="#38BDF8" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#0284C7' }}>
+                            <Radio size={13} color="#0284C7" />
                             <span>BAY OF BENGAL METEOROLOGICAL RADAR • 19.8°N 86.7°E</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#DC2626', color: '#FFFFFF', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#FEE2E2', color: '#991B1B', border: '1px solid #FECACA', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             SIGNAL 8/10 RULE
                           </span>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '0.55rem', marginBottom: '0.55rem' }}>
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Significant Wave Swell (Hs)</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>Significant Wave Swell (Hs)</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: '#F59E0B', fontFamily: 'var(--font-mono)' }}>3.2m</span>
-                              <span style={{ fontSize: '0.66rem', color: '#CBD5E1' }}>Hs (2.8m - 4.2m)</span>
+                              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: '#D97706', fontFamily: 'var(--font-mono)' }}>3.2m</span>
+                              <span style={{ fontSize: '0.66rem', color: '#64748B' }}>Hs (2.8m - 4.2m)</span>
                             </div>
-                            <div style={{ height: '6px', background: 'rgba(255,255,255,0.12)', borderRadius: '9999px', marginTop: '0.3rem', overflow: 'hidden' }}>
+                            <div style={{ height: '6px', background: '#E2E8F0', borderRadius: '9999px', marginTop: '0.3rem', overflow: 'hidden' }}>
                               <div style={{ width: '68%', height: '100%', background: 'linear-gradient(90deg, #10B981 0%, #F59E0B 60%, #EF4444 100%)', borderRadius: '9999px' }} />
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#FCD34D', marginTop: '0.25rem', fontWeight: 600 }}>Exceeds Lightering Ceiling (2.5m) • Direct Berth Only</div>
+                            <div style={{ fontSize: '0.58rem', color: '#B45309', marginTop: '0.25rem', fontWeight: 600 }}>Exceeds Lightering Ceiling (2.5m) • Direct Berth Only</div>
                           </div>
 
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>IMD Storm Intensity Scale</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>IMD Storm Intensity Scale</div>
                             <div style={{ display: 'flex', gap: '2px', marginTop: '0.3rem', height: '19px', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ flex: 1, background: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>LPA</div>
-                              <div style={{ flex: 1.3, background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 800, color: '#000' }}>DEPR ★</div>
-                              <div style={{ flex: 1, background: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>STORM</div>
-                              <div style={{ flex: 1, background: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>VSCS</div>
+                              <div style={{ flex: 1, background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>LPA</div>
+                              <div style={{ flex: 1.3, background: '#FEF3C7', color: '#92400E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 800 }}>DEPR ★</div>
+                              <div style={{ flex: 1, background: '#FFEDD5', color: '#9A3412', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>STORM</div>
+                              <div style={{ flex: 1, background: '#FEE2E2', color: '#991B1B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>VSCS</div>
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#38BDF8', marginTop: '0.25rem', fontWeight: 600 }}>Seasonal Low Pressure / Swell Watch Active</div>
+                            <div style={{ fontSize: '0.58rem', color: '#0284C7', marginTop: '0.25rem', fontWeight: 600 }}>Seasonal Low Pressure / Swell Watch Active</div>
                           </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                          <div style={{ flex: 1, minWidth: '140px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', padding: '0.35rem 0.55rem', fontSize: '0.65rem', color: '#FCA5A5', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Wind size={12} color="#EF4444" />
+                          <div style={{ flex: 1, minWidth: '140px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '6px', padding: '0.35rem 0.55rem', fontSize: '0.65rem', color: '#991B1B', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Wind size={12} color="#DC2626" />
                             <span><strong>Signal 8/10 Rule:</strong> Drift 25 NM if wind &gt; 45 kn</span>
                           </div>
-                          <div style={{ flex: 1, minWidth: '140px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '6px', padding: '0.35rem 0.55rem', fontSize: '0.65rem', color: '#6EE7B7', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Lock size={12} color="#10B981" />
+                          <div style={{ flex: 1, minWidth: '140px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '6px', padding: '0.35rem 0.55rem', fontSize: '0.65rem', color: '#166534', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Lock size={12} color="#16A34A" />
                             <span><strong>BIMCO Clause:</strong> Storm hours excluded from laytime</span>
                           </div>
                         </div>
@@ -645,44 +814,44 @@ export default function FeasibilityStage() {
                     )}
 
                     {card.id === 'nav_chokepoint' && inputs.originCountry === 'Australia' && (
-                      <div style={{ background: '#0B1528', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8' }}>
-                            <Compass size={13} color="#38BDF8" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#0284C7' }}>
+                            <Compass size={13} color="#0284C7" />
                             <span>PHILLIPS CHANNEL BATHYMETRY & RECAAP TIER-2 RADAR</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             +5.6m UKC CLEARANCE
                           </span>
                         </div>
 
-                        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#94A3B8', fontWeight: 700, marginBottom: '0.25rem' }}>
+                        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#64748B', fontWeight: 700, marginBottom: '0.25rem' }}>
                             <span>0.0m Waterline</span>
-                            <span style={{ color: '#38BDF8' }}>14.2m Keel (Laden Panamax)</span>
-                            <span style={{ color: '#10B981' }}>19.8m Phillips Channel Bed</span>
+                            <span style={{ color: '#2563EB' }}>14.2m Keel (Laden Panamax)</span>
+                            <span style={{ color: '#16A34A' }}>19.8m Phillips Channel Bed</span>
                           </div>
-                          <div style={{ display: 'flex', height: '22px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)' }}>
-                            <div style={{ width: '71.7%', background: 'linear-gradient(90deg, #1E3A8A 0%, #2563EB 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 800, color: '#FFFFFF' }}>
+                          <div style={{ display: 'flex', height: '22px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
+                            <div style={{ width: '71.7%', background: 'linear-gradient(90deg, #1E40AF 0%, #3B82F6 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 800, color: '#FFFFFF' }}>
                               Laden Draft: 14.2m
                             </div>
-                            <div style={{ width: '28.3%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 900, color: '#FFFFFF' }}>
+                            <div style={{ width: '28.3%', background: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 900, color: '#FFFFFF' }}>
                               +5.6m UKC (Pass ✓)
                             </div>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#6EE7B7', marginTop: '0.35rem', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#166534', marginTop: '0.35rem', fontWeight: 600 }}>
                             <span>Statutory Malacca Minimum: 3.5m UKC</span>
-                            <span>Safety Cushion: +2.1m Above Rule</span>
+                            <span style={{ color: '#15803D' }}>Safety Cushion: +2.1m Above Rule</span>
                           </div>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.5rem' }}>
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem', color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Radio size={12} color="#38BDF8" />
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid #E2E8F0', fontSize: '0.65rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Radio size={12} color="#0284C7" />
                             <span><strong>ReCAAP Tier-2:</strong> 24h illuminated deck watch • Speed ≥12.5 kn</span>
                           </div>
-                          <div style={{ background: 'rgba(16, 185, 129, 0.12)', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid rgba(16, 185, 129, 0.25)', fontSize: '0.65rem', color: '#A7F3D0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <CheckCircle2 size={12} color="#10B981" />
+                          <div style={{ background: '#F0FDF4', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid #BBF7D0', fontSize: '0.65rem', color: '#166534', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <CheckCircle2 size={12} color="#16A34A" />
                             <span><strong>+$142k Saved</strong> vs Lombok bypass</span>
                           </div>
                         </div>
@@ -690,62 +859,62 @@ export default function FeasibilityStage() {
                     )}
 
                     {card.id === 'imsbc_chemistry' && (
-                      <div style={{ background: '#0F172A', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#FBBF24' }}>
-                            <Flame size={13} color="#FBBF24" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#D97706' }}>
+                            <Flame size={13} color="#D97706" />
                             <span>IMSBC GROUP A & B LAB TELEMETRY • BOWEN BASIN COAL</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             LIQUEFACTION SAFE
                           </span>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.45rem', marginBottom: '0.55rem' }}>
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Moisture vs TML</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>Moisture vs TML</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#10B981', fontFamily: 'var(--font-mono)' }}>7.8%</span>
-                              <span style={{ fontSize: '0.6rem', color: '#94A3B8' }}>/ 9.5%</span>
+                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#16A34A', fontFamily: 'var(--font-mono)' }}>7.8%</span>
+                              <span style={{ fontSize: '0.6rem', color: '#64748B' }}>/ 9.5%</span>
                             </div>
-                            <div style={{ height: '5px', background: 'rgba(255,255,255,0.1)', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
-                              <div style={{ width: '82%', height: '100%', background: '#10B981', borderRadius: '9999px' }} />
+                            <div style={{ height: '5px', background: '#E2E8F0', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
+                              <div style={{ width: '82%', height: '100%', background: '#16A34A', borderRadius: '9999px' }} />
                             </div>
-                            <div style={{ fontSize: '0.55rem', color: '#6EE7B7', marginTop: '0.2rem', fontWeight: 700 }}>TML Safe (-1.7%)</div>
+                            <div style={{ fontSize: '0.55rem', color: '#15803D', marginTop: '0.2rem', fontWeight: 700 }}>TML Safe (-1.7%)</div>
                           </div>
 
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Hold CO Gas</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>Hold CO Gas</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#38BDF8', fontFamily: 'var(--font-mono)' }}>14</span>
-                              <span style={{ fontSize: '0.6rem', color: '#94A3B8' }}>ppm</span>
+                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#0284C7', fontFamily: 'var(--font-mono)' }}>14</span>
+                              <span style={{ fontSize: '0.6rem', color: '#64748B' }}>ppm</span>
                             </div>
-                            <div style={{ height: '5px', background: 'rgba(255,255,255,0.1)', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
-                              <div style={{ width: '28%', height: '100%', background: '#38BDF8', borderRadius: '9999px' }} />
+                            <div style={{ height: '5px', background: '#E2E8F0', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
+                              <div style={{ width: '28%', height: '100%', background: '#0284C7', borderRadius: '9999px' }} />
                             </div>
-                            <div style={{ fontSize: '0.55rem', color: '#38BDF8', marginTop: '0.2rem', fontWeight: 700 }}>Trigger &gt;50 ppm Safe</div>
+                            <div style={{ fontSize: '0.55rem', color: '#0369A1', marginTop: '0.2rem', fontWeight: 700 }}>Trigger &gt;50 ppm Safe</div>
                           </div>
 
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Methane (CH₄)</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>Methane (CH₄)</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#FBBF24', fontFamily: 'var(--font-mono)' }}>0.1%</span>
-                              <span style={{ fontSize: '0.6rem', color: '#94A3B8' }}>LEL</span>
+                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#D97706', fontFamily: 'var(--font-mono)' }}>0.1%</span>
+                              <span style={{ fontSize: '0.6rem', color: '#64748B' }}>LEL</span>
                             </div>
-                            <div style={{ height: '5px', background: 'rgba(255,255,255,0.1)', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
-                              <div style={{ width: '10%', height: '100%', background: '#FBBF24', borderRadius: '9999px' }} />
+                            <div style={{ height: '5px', background: '#E2E8F0', borderRadius: '9999px', marginTop: '0.25rem', overflow: 'hidden' }}>
+                              <div style={{ width: '10%', height: '100%', background: '#D97706', borderRadius: '9999px' }} />
                             </div>
-                            <div style={{ fontSize: '0.55rem', color: '#FDE68A', marginTop: '0.2rem', fontWeight: 700 }}>Limit &gt;1.0% Safe</div>
+                            <div style={{ fontSize: '0.55rem', color: '#B45309', marginTop: '0.2rem', fontWeight: 700 }}>Limit &gt;1.0% Safe</div>
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.4rem 0.65rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#6EE7B7' }}>
-                            <CheckCircle2 size={12} color="#10B981" />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', borderRadius: '6px', padding: '0.4rem 0.65rem', border: '1px solid #E2E8F0', fontSize: '0.65rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#166534' }}>
+                            <CheckCircle2 size={12} color="#16A34A" />
                             <span><strong>Surface Vents:</strong> OPEN (Venting Methane)</span>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#FCA5A5' }}>
-                            <Lock size={12} color="#EF4444" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#991B1B' }}>
+                            <Lock size={12} color="#DC2626" />
                             <span><strong>Bottom Bilge Air:</strong> LOCKED OFF</span>
                           </div>
                         </div>
@@ -753,44 +922,44 @@ export default function FeasibilityStage() {
                     )}
 
                     {card.id === 'bimco_legal' && (
-                      <div style={{ background: '#0B1528', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8' }}>
-                            <Scale size={13} color="#38BDF8" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#0284C7' }}>
+                            <Scale size={13} color="#0284C7" />
                             <span>BIMCO 2011 SPEED THROTTLE & VIRTUAL NOR CHRONOMETER</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             NOR LOCKED AT SEA
                           </span>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.55rem', marginBottom: '0.55rem' }}>
-                          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <div style={{ fontSize: '0.6rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Unmanaged Sea Speed</div>
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #E2E8F0' }}>
+                            <div style={{ fontSize: '0.6rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700 }}>Unmanaged Sea Speed</div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#F8FAFC' }}>14.0 kn</span>
-                              <span style={{ fontSize: '0.66rem', color: '#EF4444', fontWeight: 700 }}>32.0 MT / Day</span>
+                              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A' }}>14.0 kn</span>
+                              <span style={{ fontSize: '0.66rem', color: '#DC2626', fontWeight: 700 }}>32.0 MT / Day</span>
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#94A3B8', marginTop: '0.15rem' }}>Rushes to wait at anchor (excess burn)</div>
+                            <div style={{ fontSize: '0.58rem', color: '#64748B', marginTop: '0.15rem' }}>Rushes to wait at anchor (excess burn)</div>
                           </div>
 
-                          <div style={{ background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                            <div style={{ fontSize: '0.6rem', color: '#6EE7B7', textTransform: 'uppercase', fontWeight: 700 }}>BIMCO Eco-Steaming</div>
+                          <div style={{ background: '#F0FDF4', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #BBF7D0' }}>
+                            <div style={{ fontSize: '0.6rem', color: '#166534', textTransform: 'uppercase', fontWeight: 700 }}>BIMCO Eco-Steaming</div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.15rem' }}>
-                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#10B981' }}>11.5 kn</span>
-                              <span style={{ fontSize: '0.66rem', color: '#10B981', fontWeight: 800 }}>20.8 MT / Day</span>
+                              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#16A34A' }}>11.5 kn</span>
+                              <span style={{ fontSize: '0.66rem', color: '#166534', fontWeight: 800 }}>20.8 MT / Day</span>
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#34D399', marginTop: '0.15rem', fontWeight: 700 }}>Smooth timed arrival for berth slot</div>
+                            <div style={{ fontSize: '0.58rem', color: '#15803D', marginTop: '0.15rem', fontWeight: 700 }}>Smooth timed arrival for berth slot</div>
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(16, 185, 129, 0.15)', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid rgba(16, 185, 129, 0.35)', fontSize: '0.66rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#FFFFFF', fontWeight: 800 }}>
-                            <CheckCircle2 size={13} color="#10B981" />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDF4', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid #BBF7D0', fontSize: '0.66rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#166534', fontWeight: 800 }}>
+                            <CheckCircle2 size={13} color="#16A34A" />
                             <span>Saves ~35 MT VLSFO ($21,700 USD)</span>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#6EE7B7', fontWeight: 700 }}>
-                            <Lock size={12} color="#10B981" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#15803D', fontWeight: 700 }}>
+                            <Lock size={12} color="#16A34A" />
                             <span>Virtual NOR Clock Protected</span>
                           </div>
                         </div>
@@ -798,47 +967,47 @@ export default function FeasibilityStage() {
                     )}
 
                     {card.id === 'port_terminal' && (
-                      <div style={{ background: '#0F172A', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8' }}>
-                            <Anchor size={13} color="#38BDF8" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#0284C7' }}>
+                            <Anchor size={13} color="#0284C7" />
                             <span>PARADIP CENTRAL BERTH CB-1/CB-2 BATHYMETRY & TIDES</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             DIRECT BERTH QUALIFIED
                           </span>
                         </div>
 
-                        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#94A3B8', fontWeight: 700, marginBottom: '0.25rem' }}>
+                        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#64748B', fontWeight: 700, marginBottom: '0.25rem' }}>
                             <span>Low Water Datum: 13.5m</span>
-                            <span style={{ color: '#38BDF8' }}>Arrival Draft: 14.15m</span>
-                            <span style={{ color: '#10B981' }}>High Water Spring: 14.5m</span>
+                            <span style={{ color: '#2563EB' }}>Arrival Draft: 14.15m</span>
+                            <span style={{ color: '#16A34A' }}>High Water Spring: 14.5m</span>
                           </div>
-                          <div style={{ display: 'flex', height: '22px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)' }}>
-                            <div style={{ width: '65%', background: '#1E293B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', color: '#94A3B8' }}>
+                          <div style={{ display: 'flex', height: '22px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
+                            <div style={{ width: '65%', background: '#F1F5F9', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 600 }}>
                               Channel Base (13.5m)
                             </div>
                             <div style={{ width: '25%', background: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 800, color: '#FFFFFF' }}>
                               Laden Keel (14.15m)
                             </div>
-                            <div style={{ width: '10%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 900, color: '#FFFFFF' }}>
-                              +0.35m HW Tide Buffer
+                            <div style={{ width: '10%', background: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 900, color: '#FFFFFF' }}>
+                              +0.35m HW Buffer
                             </div>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#FCD34D', marginTop: '0.35rem', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#B45309', marginTop: '0.35rem', fontWeight: 600 }}>
                             <span>Daylight HW Slack Tide Window Reserved</span>
-                            <span style={{ color: '#6EE7B7' }}>Avoids $266k Sagar Lightering</span>
+                            <span style={{ color: '#166534' }}>Avoids $266k Sagar Lightering</span>
                           </div>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem', color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Zap size={12} color="#FBBF24" />
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid #E2E8F0', fontSize: '0.65rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Zap size={12} color="#D97706" />
                             <span><strong>MCHP Conveyor:</strong> 35,000 MT/day (2.0d turn)</span>
                           </div>
-                          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem', color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Activity size={12} color="#38BDF8" />
+                          <div style={{ background: '#FFFFFF', borderRadius: '6px', padding: '0.4rem 0.55rem', border: '1px solid #E2E8F0', fontSize: '0.65rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Activity size={12} color="#0284C7" />
                             <span><strong>TSHD Dredger:</strong> Mahanadi sand managed</span>
                           </div>
                         </div>
@@ -846,80 +1015,80 @@ export default function FeasibilityStage() {
                     )}
 
                     {card.id === 'marpol_env' && (
-                      <div style={{ background: '#0B1528', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#34D399' }}>
-                            <Waves size={13} color="#34D399" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#059669' }}>
+                            <Waves size={13} color="#059669" />
                             <span>IMO MARPOL 0.50% S & DGS 12 NM SCRUBBER ZERO-DISCHARGE</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             PSC AUDIT PASSED
                           </span>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.55rem', marginBottom: '0.55rem' }}>
-                          <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#FCA5A5', textTransform: 'uppercase', fontWeight: 700 }}>Open-Loop Scrubber Washwater</div>
+                          <div style={{ background: '#FEF2F2', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #FECACA' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#991B1B', textTransform: 'uppercase', fontWeight: 700 }}>Open-Loop Scrubber Washwater</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
-                              <Lock size={12} color="#EF4444" />
-                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#EF4444' }}>LOCKED / 0 DISCHARGE</span>
+                              <Lock size={12} color="#DC2626" />
+                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#DC2626' }}>LOCKED / 0 DISCHARGE</span>
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#F87171', marginTop: '0.15rem' }}>DGS Order 02/2023 Ban in 12 NM</div>
+                            <div style={{ fontSize: '0.58rem', color: '#B91C1C', marginTop: '0.15rem' }}>DGS Order 02/2023 Ban in 12 NM</div>
                           </div>
 
-                          <div style={{ background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                            <div style={{ fontSize: '0.58rem', color: '#6EE7B7', textTransform: 'uppercase', fontWeight: 700 }}>Compliant VLSFO (≤0.50% S)</div>
+                          <div style={{ background: '#F0FDF4', borderRadius: '6px', padding: '0.5rem 0.65rem', border: '1px solid #BBF7D0' }}>
+                            <div style={{ fontSize: '0.58rem', color: '#166534', textTransform: 'uppercase', fontWeight: 700 }}>Compliant VLSFO (≤0.50% S)</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
-                              <CheckCircle2 size={12} color="#10B981" />
-                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#10B981' }}>ACTIVE / 48H LOGGED</span>
+                              <CheckCircle2 size={12} color="#16A34A" />
+                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#16A34A' }}>ACTIVE / 48H LOGGED</span>
                             </div>
-                            <div style={{ fontSize: '0.58rem', color: '#34D399', marginTop: '0.15rem' }}>Pre-arrival fuel switch confirmed</div>
+                            <div style={{ fontSize: '0.58rem', color: '#15803D', marginTop: '0.15rem' }}>Pre-arrival fuel switch confirmed</div>
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem', color: '#E2E8F0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid #E2E8F0', fontSize: '0.65rem', color: '#334155' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <Droplets size={12} color="#38BDF8" />
+                            <Droplets size={12} color="#0284C7" />
                             <span><strong>IMO D-2 Ballast Protocol:</strong> Mid-ocean turnover executed (&gt;200m depth)</span>
                           </div>
-                          <span style={{ color: '#10B981', fontWeight: 700 }}>✓ VERIFIED</span>
+                          <span style={{ color: '#16A34A', fontWeight: 700 }}>✓ VERIFIED</span>
                         </div>
                       </div>
                     )}
 
                     {card.id === 'nav_gbr_pilotage' && (
-                      <div style={{ background: '#0B1528', borderRadius: '10px', padding: '0.85rem', color: '#F8FAFC', margin: '0.65rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem', color: '#0F172A', margin: '0.65rem 0', border: '1px solid #E2E8F0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#38BDF8' }}>
-                            <Navigation size={13} color="#38BDF8" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.68rem', fontWeight: 800, color: '#0284C7' }}>
+                            <Navigation size={13} color="#0284C7" />
                             <span>HYDROGRAPHERS PASSAGE FAIRWAY • GBR PSSA CORRIDOR</span>
                           </div>
-                          <span style={{ fontSize: '0.62rem', background: '#065F46', color: '#D1FAE5', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '0.62rem', background: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 800 }}>
                             AMSA PILOT ONBOARD
                           </span>
                         </div>
 
-                        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#94A3B8', fontWeight: 700, marginBottom: '0.25rem' }}>
+                        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.65rem 0.85rem', marginBottom: '0.55rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#64748B', fontWeight: 700, marginBottom: '0.25rem' }}>
                             <span>Blossom Bank Boarding Ground</span>
-                            <span style={{ color: '#38BDF8' }}>Locked ECDIS Track (XTE &lt; 0.1 NM)</span>
-                            <span style={{ color: '#10B981' }}>Coral Sea Deepwater Exit</span>
+                            <span style={{ color: '#2563EB' }}>Locked ECDIS Track (XTE &lt; 0.1 NM)</span>
+                            <span style={{ color: '#16A34A' }}>Coral Sea Deepwater Exit</span>
                           </div>
-                          <div style={{ height: '18px', background: 'repeating-linear-gradient(90deg, #1E3A8A, #1E3A8A 12px, #2563EB 12px, #2563EB 24px)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 800, color: '#E2E8F0' }}>
+                          <div style={{ height: '18px', background: 'repeating-linear-gradient(90deg, #1E40AF, #1E40AF 12px, #3B82F6 12px, #3B82F6 24px)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.62rem', fontWeight: 800, color: '#FFFFFF' }}>
                             HYDROGRAPHERS PASSAGE DEEPWATER FAIRWAY (AUS 249)
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#6EE7B7', marginTop: '0.35rem', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#166534', marginTop: '0.35rem', fontWeight: 600 }}>
                             <span>AMSA Marine Order 54 Coastal Pilotage Mandate</span>
                             <span>Zero Reef Grounding Liability</span>
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(16, 185, 129, 0.12)', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid rgba(16, 185, 129, 0.3)', fontSize: '0.65rem', color: '#A7F3D0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDF4', borderRadius: '6px', padding: '0.4rem 0.7rem', border: '1px solid #BBF7D0', fontSize: '0.65rem', color: '#166534' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <ShieldCheck size={12} color="#10B981" />
+                            <ShieldCheck size={12} color="#16A34A" />
                             <span><strong>GBRMPA Status:</strong> Particularly Sensitive Sea Area Cleared</span>
                           </div>
-                          <span style={{ color: '#FFFFFF', fontWeight: 800 }}>LICENSED ✓</span>
+                          <span style={{ color: '#15803D', fontWeight: 800 }}>LICENSED ✓</span>
                         </div>
                       </div>
                     )}

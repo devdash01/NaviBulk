@@ -508,7 +508,12 @@ export function DecisionProvider({ children }) {
       totalOptimizationSavingsUsd,
       totalOptimizationPerMt,
       portStayDays,
-      portWaitDays
+      portWaitDays,
+      distanceNm,
+      dailyHireRate,
+      curTotalBunkerCost: Math.round(curTotalBunkerCost),
+      curTotalBunkerTons,
+      totalPortDuesUsd: Math.round(totalPortDuesUsd)
     };
   }, [recommendedVessel, inputs.tonnage, inputs.originCountry, inputs.destinationPortKey, inputs.speedKnots]);
 
